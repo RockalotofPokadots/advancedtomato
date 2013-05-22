@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <!--
 	Tomato GUI
 	Copyright (C) 2006-2010 Jonathan Zarate
@@ -6,7 +7,7 @@
 	For use with Tomato Firmware only.
 	No part of this file may be used without permission.
 -->
-<html>
+<html lang="en">
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
@@ -25,7 +26,7 @@ function tick()
 }
 </script></head>
 <body style='background:#fff' onload='tick()'><table style='width:100%;height:100%'>
-<tr><td style='text-align:center;vertical-align:middle;font:12px sans-serif'>
+<tr><td style='text-align:center;vertical-align:middle;font:15px sans-serif'>
 <span id='msg'>Please wait while the router shuts down... <span id='sptime' style='font-size:80%;background:#eee'></span></span>
 </td></tr>
 </table></body></html>

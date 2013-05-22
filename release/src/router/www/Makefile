@@ -8,8 +8,15 @@ clean:
 install:
 	rm -rf $(INSTALLDIR)/www
 	mkdir -p $(INSTALLDIR)/www
+	mkdir -p $(INSTALLDIR)/www/img
+	mkdir -p $(INSTALLDIR)/www/js
+	mkdir -p $(INSTALLDIR)/www/css
+	cp -r img/* $(INSTALLDIR)/www/img/.
+	cp -r css/* $(INSTALLDIR)/www/css/.
+	cp -r js/* $(INSTALLDIR)/www/js/.
+	chmod 0777 $(INSTALLDIR)/www*
 
-	cp *.gif *.png *.ico *.html robots.txt $(INSTALLDIR)/www
+	cp *.gif *.ico *.html robots.txt $(INSTALLDIR)/www
 
 # squish some of the files by trimming whitespace...
 
@@ -100,9 +107,8 @@ endif
 # Victek for RAF verion
 # Only include Captive Portal menu option and pages when configured.
 ifneq ($(TCONFIG_NOCAT),y)
-	rm -f $(INSTALLDIR)/www/splashd.asp
+	rm -f $(INSTALLDIR)/www/advanced-splashd.asp
 	rm -f $(INSTALLDIR)/www/splash.html
-	rm -f $(INSTALLDIR)/www/style.css
 	sed -i $(INSTALLDIR)/www/tomato.js -e "/NOCAT-BEGIN/,/NOCAT-END/d"
 	sed -i $(INSTALLDIR)/www/about.asp -e "/NOCAT-BEGIN/,/NOCAT-END/d"
 endif
@@ -163,20 +169,6 @@ endif
 
 # Only include CTF option if CTF module exists
 	test -d $(SRCBASE)/ctf/linux || sed -i $(INSTALLDIR)/www/advanced-misc.asp -e "/CTF-BEGIN/,/CTF-END/d"
-
-ifeq ($(TOMATO_EXPERIMENTAL),1)
-	cd $(INSTALLDIR)/www && \
-	for F in $(wildcard *.asp); do \
-		sed -e "s,<div class='title'>Tomato</div>,<div class='title'>Tomato <small><i>(beta)</i></small></div>," $$F > $$F.tmp; \
-		mv $$F.tmp $$F; \
-	done
-endif
-
-	cd $(INSTALLDIR)/www && \
-	for F in $(wildcard *.asp); do \
-		sed -e "s,<div class='version'>Version <% version(); %></div>,<div class='version'>Version <% version(); %> by shibby</div>," $$F > $$F.tmp; \
-		mv $$F.tmp $$F; \
-	done
 
 
 # Only include the vpn pages if OpenVPN is compiled in
@@ -273,9 +265,14 @@ endif
 	@rm -f $(INSTALLDIR)/www/*-old.*
 	@rm -f $(INSTALLDIR)/www/color.css
 
-	chmod 0644 $(INSTALLDIR)/www/*
+	chmod -R 0777 $(INSTALLDIR)/www/*
 
 # remove C-style comments from java files. All "control" comments have been processed by now.
 	for F in $(wildcard *.js *.jsx); do \
 		[ -f $(INSTALLDIR)/www/$$F ] && $(TOP)/www/remcoms2.sh $(INSTALLDIR)/www/$$F c; \
 	done
+    
+cd js/
+    for F in $(wildcard *.js *.jsx); do \
+        [ -f $(INSTALLDIR)/www/js/$$F ] && $(TOP)/www/remcoms2.sh $(INSTALLDIR)/www/js/$$F c; \
+    done

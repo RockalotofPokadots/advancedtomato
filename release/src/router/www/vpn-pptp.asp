@@ -1,162 +1,175 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
+<!DOCTYPE html>
 <!--
-	Tomato GUI
-	Copyright (C) 2006-2009 Jonathan Zarate
-	http://www.polarcloud.com/tomato/
+Tomato GUI
+Copyright (C) 2006-2009 Jonathan Zarate
+http://www.polarcloud.com/tomato/
 
-	Portions Copyright (C) 2010-2011 Jean-Yves Avenard, jean-yves@avenard.org
+Portions Copyright (C) 2010-2011 Jean-Yves Avenard, jean-yves@avenard.org
 
-	For use with Tomato Firmware only.
-	No part of this file may be used without permission.
+For use with Tomato Firmware only.
+No part of this file may be used without permission.
 -->
-<html>
-<head>
-<meta http-equiv='content-type' content='text/html;charset=utf-8'>
-<meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] PPTP: Client</title>
-<link rel='stylesheet' type='text/css' href='tomato.css'>
-<link rel='stylesheet' type='text/css' href='color.css'>
-<script type='text/javascript' src='/tomato.js'></script>
-
-<!-- / / / -->
-
-<script type='text/javascript' src='/debug.js'></script>
-
-<script type='text/javascript'>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="content-type" content="text/html;charset=utf-8">
+        <meta name="robots" content="noindex,nofollow">
+        <title>[<% ident(); %>] PPTP: Client</title>
 
 
-//	<% nvram("pptp_client_enable,pptp_client_peerdns,pptp_client_mtuenable,pptp_client_mtu,pptp_client_mruenable,pptp_client_mru,pptp_client_nat,pptp_client_srvip,pptp_client_srvsub,pptp_client_srvsubmsk,pptp_client_username,pptp_client_passwd,pptp_client_mppeopt,pptp_client_crypt,pptp_client_custom,pptp_client_dfltroute,pptp_client_stateless"); %>
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/bootstrap-responsive.min.css" rel="stylesheet">
+        <link href="css/tomato.css" rel="stylesheet">
+        <% css(); %>
 
-pptpup = parseInt('<% psup("pptpclient"); %>');
 
-var changed = 0;
+        <script type="text/javascript" src="js/jquery.lite.min.js"></script>
 
-function toggle(service, isup)
-{
-	if (changed) {
-		if (!confirm("Unsaved changes will be lost. Continue anyway?")) return;
-	}
-	E('_' + service + '_button').disabled = true;
-	form.submitHidden('/service.cgi', {
-		_redirect: 'vpn-pptp.asp',
-		_service: service + (isup ? '-stop' : '-start')
-	});
-}
+        <script type="text/javascript" src="tomato.js"></script>
 
-function verifyFields(focused, quiet)
-{
-    var ret = 1;
+        <script type="text/javascript">
 
-	elem.display(PR('_pptp_client_srvsub'), PR('_pptp_client_srvsubmsk'), !E('_f_pptp_client_dfltroute').checked);
 
-	var f = E('_pptp_client_mtuenable').value == '0';
-	if (f) {
-		E('_pptp_client_mtu').value = '1450';
-	}
-	E('_pptp_client_mtu').disabled = f;
-	f = E('_pptp_client_mruenable').value == '0';
-	if (f) {
-		E('_pptp_client_mru').value = '1450';
-	}
-	E('_pptp_client_mru').disabled = f;
+            //	<% nvram("at_update,tomatoanon_answer,pptp_client_enable,pptp_client_peerdns,pptp_client_mtuenable,pptp_client_mtu,pptp_client_mruenable,pptp_client_mru,pptp_client_nat,pptp_client_srvip,pptp_client_srvsub,pptp_client_srvsubmsk,pptp_client_username,pptp_client_passwd,pptp_client_mppeopt,pptp_client_crypt,pptp_client_custom,pptp_client_dfltroute,pptp_client_stateless"); %>
 
-	if (!v_range('_pptp_client_mtu', quiet, 576, 1500)) ret = 0;
-	if (!v_range('_pptp_client_mru', quiet, 576, 1500)) ret = 0;
-	if (!v_ip('_pptp_client_srvip', true) && !v_domain('_pptp_client_srvip', true)) { ferror.set(E('_pptp_client_srvip'), "Invalid server address.", quiet); ret = 0; }
-	if (!E('_f_pptp_client_dfltroute').checked && !v_ip('_pptp_client_srvsub', true)) { ferror.set(E('_pptp_client_srvsub'), "Invalid subnet address.", quiet); ret = 0; }
-	if (!E('_f_pptp_client_dfltroute').checked && !v_ip('_pptp_client_srvsubmsk', true)) { ferror.set(E('_pptp_client_srvsubmsk'), "Invalid netmask address.", quiet); ret = 0; }
-	
-    changed |= ret;
-	return ret;
-}
+            pptpup = parseInt('<% psup("pptpclient"); %>');
 
-function save()
-{
-	if (!verifyFields(null, false)) return;
+            var changed = 0;
 
-	var fom = E('_fom');
+            function toggle(service, isup)
+            {
+                if (changed) {
+                    if (!confirm("Unsaved changes will be lost. Continue anyway?")) return;
+                }
+                E('_' + service + '_button').disabled = true;
+                form.submitHidden('/service.cgi', {
+                        _redirect: 'vpn-pptp.asp',
+                        _service: service + (isup ? '-stop' : '-start')
+                });
+            }
 
-    E('pptp_client_enable').value = E('_f_pptp_client_enable').checked ? 1 : 0;
-    E('pptp_client_nat').value = E('_f_pptp_client_nat').checked ? 1 : 0;
-    E('pptp_client_dfltroute').value = E('_f_pptp_client_dfltroute').checked ? 1 : 0;
-    E('pptp_client_stateless').value = E('_f_pptp_client_stateless').checked ? 1 : 0;
+            function verifyFields(focused, quiet)
+            {
+                var ret = 1;
 
-	form.submit(fom, 1);
+                elem.display(PR('_pptp_client_srvsub'), PR('_pptp_client_srvsubmsk'), !E('_f_pptp_client_dfltroute').checked);
 
-	changed = 0;
-}
-</script>
+                var f = E('_pptp_client_mtuenable').value == '0';
+                if (f) {
+                    E('_pptp_client_mtu').value = '1450';
+                }
+                E('_pptp_client_mtu').disabled = f;
+                f = E('_pptp_client_mruenable').value == '0';
+                if (f) {
+                    E('_pptp_client_mru').value = '1450';
+                }
+                E('_pptp_client_mru').disabled = f;
 
-<style type='text/css'>
-textarea {
-	width: 98%;
-	height: 10em;
-}
-</style>
+                if (!v_range('_pptp_client_mtu', quiet, 576, 1500)) ret = 0;
+                if (!v_range('_pptp_client_mru', quiet, 576, 1500)) ret = 0;
+                if (!v_ip('_pptp_client_srvip', true) && !v_domain('_pptp_client_srvip', true)) { ferror.set(E('_pptp_client_srvip'), "Invalid server address.", quiet); ret = 0; }
+                if (!E('_f_pptp_client_dfltroute').checked && !v_ip('_pptp_client_srvsub', true)) { ferror.set(E('_pptp_client_srvsub'), "Invalid subnet address.", quiet); ret = 0; }
+                if (!E('_f_pptp_client_dfltroute').checked && !v_ip('_pptp_client_srvsubmsk', true)) { ferror.set(E('_pptp_client_srvsubmsk'), "Invalid netmask address.", quiet); ret = 0; }
 
-</head>
-<body>
-<form id='_fom' method='post' action='/tomato.cgi'>
-<table id='container' cellspacing=0>
-<tr><td colspan=2 id='header'>
-	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
-</td></tr>
-<tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
-<td id='content'>
-<div id='ident'><% ident(); %></div>
+                changed |= ret;
+                return ret;
+            }
 
-<!-- / / / -->
+            function save()
+            {
+                if (!verifyFields(null, false)) return;
 
-<input type='hidden' name='_nextpage' value='vpn-pptp.asp'>
-<input type='hidden' name='_service' value=''>
-<input type='hidden' name='_nextwait' value='5'>
+                var fom = E('_fom');
 
-<input type='hidden' id='pptp_client_enable' name='pptp_client_enable'>
-<input type='hidden' id='pptp_client_peerdns' name='pptp_client_peerdns'>
-<input type='hidden' id='pptp_client_nat' name='pptp_client_nat'>
-<input type='hidden' id='pptp_client_dfltroute' name='pptp_client_dfltroute'>
-<input type='hidden' id='pptp_client_stateless' name='pptp_client_stateless'>
+                E('pptp_client_enable').value = E('_f_pptp_client_enable').checked ? 1 : 0;
+                E('pptp_client_nat').value = E('_f_pptp_client_nat').checked ? 1 : 0;
+                E('pptp_client_dfltroute').value = E('_f_pptp_client_dfltroute').checked ? 1 : 0;
+                E('pptp_client_stateless').value = E('_f_pptp_client_stateless').checked ? 1 : 0;
 
-<div class='section-title'>PPTP Client Configuration</div>
-<div class='section'>
-<script type='text/javascript'>
-createFieldTable('', [
-	{ title: 'Start with WAN', name: 'f_pptp_client_enable', type: 'checkbox', value: nvram.pptp_client_enable != 0 },
-    { title: 'Server Address', name: 'pptp_client_srvip', type: 'text', size: 17, value: nvram.pptp_client_srvip },
-    { title: 'Username: ', name: 'pptp_client_username', type: 'text', maxlen: 50, size: 54, value: nvram.pptp_client_username },
-    { title: 'Password: ', name: 'pptp_client_passwd', type: 'password', maxlen: 50, size: 54, value: nvram.pptp_client_passwd },
-	{ title: 'Encryption', name: 'pptp_client_crypt', type: 'select', value: nvram.pptp_client_crypt,
-        options: [['0', 'Auto'],['1', 'None'],['2','Maximum (128 bit only)'],['3','Required (128 or 40 bit)']] },
-	{ title: 'Stateless MPPE connection', name: 'f_pptp_client_stateless', type: 'checkbox', value: nvram.pptp_client_stateless != 0 },
-	{ title: 'Accept DNS configuration', name: 'pptp_client_peerdns', type: 'select', options: [[0, 'Disabled'],[1, 'Yes'],[2, 'Exclusive']], value: nvram.pptp_client_peerdns },
-	{ title: 'Redirect Internet traffic', name: 'f_pptp_client_dfltroute', type: 'checkbox', value: nvram.pptp_client_dfltroute != 0 },
-    { title: 'Remote subnet / netmask', multi: [
-        { name: 'pptp_client_srvsub', type: 'text', maxlen: 15, size: 17, value: nvram.pptp_client_srvsub },
-        { name: 'pptp_client_srvsubmsk', type: 'text', maxlen: 15, size: 17, prefix: ' /&nbsp', value: nvram.pptp_client_srvsubmsk } ] },
-	{ title: 'Create NAT on tunnel', name: 'f_pptp_client_nat', type: 'checkbox', value: nvram.pptp_client_nat != 0 },
-	{ title: 'MTU', multi: [
-		{ name: 'pptp_client_mtuenable', type: 'select', options: [['0', 'Default'],['1','Manual']], value: nvram.pptp_client_mtuenable },
-		{ name: 'pptp_client_mtu', type: 'text', maxlen: 4, size: 6, value: nvram.pptp_client_mtu } ] },
-	{ title: 'MRU', multi: [
-		{ name: 'pptp_client_mruenable', type: 'select', options: [['0', 'Default'],['1','Manual']], value: nvram.pptp_client_mruenable },
-		{ name: 'pptp_client_mru', type: 'text', maxlen: 4, size: 6, value: nvram.pptp_client_mru } ] },
-    { title: 'Custom Configuration', name: 'pptp_client_custom', type: 'textarea', value: nvram.pptp_client_custom }
-]);
-    W('<input type="button" value="' + (pptpup ? 'Stop' : 'Start') + ' Now" onclick="toggle(\'pptpclient\', pptpup)" id="_pptpclient_button">');
-</script>
-</div>
+                form.submit(fom, 1);
 
-<!-- / / / -->
+                changed = 0;
+            }
+        </script>
 
-</td></tr>
-<tr><td id='footer' colspan=2>
-	<span id='footer-msg'></span>
-	<input type='button' value='Save' id='save-button' onclick='save()'>
-	<input type='button' value='Cancel' id='cancel-button' onclick='reloadPage();'>
-</td></tr>
-</table>
-</form>
-<script type='text/javascript'>verifyFields(null, 1);</script>
-</body>
+        <style type='text/css'>
+            textarea {
+                width: 98%;
+                height: 10em;
+            }
+        </style>
+
+    </head>
+    <body>
+        <div id="navigation">
+            <div class="container">
+                <div class="logo"><a href="/">AdvancedTomato</a></div>
+                <div class="navi">
+                    <ul>
+                        <script type="text/javascript">navi()</script>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="main" class="container">
+            <div class="row">
+                <div class="span12">
+
+
+                    <!-- / / / -->
+                    <form id="_fom" method="post" action="tomato.cgi">
+                        <input type="hidden" name="_nextpage" value="vpn-pptp.asp">
+                        <input type="hidden" name="_service" value="">
+                        <input type="hidden" name="_nextwait" value="5">
+
+                        <input type="hidden" id="pptp_client_enable" name="pptp_client_enable">
+                        <input type="hidden" id="pptp_client_peerdns" name="pptp_client_peerdns">
+                        <input type="hidden" id="pptp_client_nat" name="pptp_client_nat">
+                        <input type="hidden" id="pptp_client_dfltroute" name="pptp_client_dfltroute">
+                        <input type="hidden" id="pptp_client_stateless" name="pptp_client_stateless">
+
+                        <h3>PPTP Client Configuration</h3>
+                        <div class='section'>
+                            <script type='text/javascript'>
+                                createFieldTable('', [
+                                        { title: 'Start with WAN', name: 'f_pptp_client_enable', type: 'checkbox', value: nvram.pptp_client_enable != 0 },
+                                        { title: 'Server Address', name: 'pptp_client_srvip', type: 'text', size: 17, value: nvram.pptp_client_srvip },
+                                        { title: 'Username: ', name: 'pptp_client_username', type: 'text', maxlen: 50, size: 54, value: nvram.pptp_client_username },
+                                        { title: 'Password: ', name: 'pptp_client_passwd', type: 'password', maxlen: 50, size: 54, value: nvram.pptp_client_passwd },
+                                        { title: 'Encryption', name: 'pptp_client_crypt', type: 'select', value: nvram.pptp_client_crypt,
+                                            options: [['0', 'Auto'],['1', 'None'],['2','Maximum (128 bit only)'],['3','Required (128 or 40 bit)']] },
+                                        { title: 'Stateless MPPE connection', name: 'f_pptp_client_stateless', type: 'checkbox', value: nvram.pptp_client_stateless != 0 },
+                                        { title: 'Accept DNS configuration', name: 'pptp_client_peerdns', type: 'select', options: [[0, 'Disabled'],[1, 'Yes'],[2, 'Exclusive']], value: nvram.pptp_client_peerdns },
+                                        { title: 'Redirect Internet traffic', name: 'f_pptp_client_dfltroute', type: 'checkbox', value: nvram.pptp_client_dfltroute != 0 },
+                                        { title: 'Remote subnet / netmask', multi: [
+                                                { name: 'pptp_client_srvsub', type: 'text', maxlen: 15, size: 17, value: nvram.pptp_client_srvsub },
+                                                { name: 'pptp_client_srvsubmsk', type: 'text', maxlen: 15, size: 17, prefix: ' /&nbsp', value: nvram.pptp_client_srvsubmsk } ] },
+                                        { title: 'Create NAT on tunnel', name: 'f_pptp_client_nat', type: 'checkbox', value: nvram.pptp_client_nat != 0 },
+                                        { title: 'MTU', multi: [
+                                                { name: 'pptp_client_mtuenable', type: 'select', options: [['0', 'Default'],['1','Manual']], value: nvram.pptp_client_mtuenable },
+                                                { name: 'pptp_client_mtu', type: 'text', maxlen: 4, size: 6, value: nvram.pptp_client_mtu } ] },
+                                        { title: 'MRU', multi: [
+                                                { name: 'pptp_client_mruenable', type: 'select', options: [['0', 'Default'],['1','Manual']], value: nvram.pptp_client_mruenable },
+                                                { name: 'pptp_client_mru', type: 'text', maxlen: 4, size: 6, value: nvram.pptp_client_mru } ] },
+                                        { title: 'Custom Configuration', name: 'pptp_client_custom', type: 'textarea', value: nvram.pptp_client_custom }
+                                    ]);
+                                W('<input type="button" value="' + (pptpup ? 'Stop' : 'Start') + ' Now" onclick="toggle(\'pptpclient\', pptpup)" id="_pptpclient_button" class="btn"><br /><br />');
+                            </script>
+                        </div>
+
+                        <button type="button" value="Save" id="save-button" onclick="save()" class="btn btn-primary">Save</button>
+                        <button type="button" value="Cancel" id="cancel-button" onclick="javascript:reloadPage();" class="btn">Cancel</button>
+                        &nbsp; <span id="footer-msg" class="alert warning" style="visibility: hidden;"></span>
+                    </form>
+
+                </div><!--/span-->
+            </div><!--/row-->
+            <hr>
+<div class="footer">
+                <p><a href="about.asp">&copy; AdvancedTomato 2013</a> <span style="padding: 0 15px; float:right; text-align:right;">Version: <b><% version(1); %></b></span></p> 
+            </div>
+        </div><!--/.fluid-container-->
+        <script type='text/javascript'>verifyFields(null, 1);</script>
+    </body>
 </html>

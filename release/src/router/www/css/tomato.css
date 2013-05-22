@@ -1,0 +1,57 @@
+body,.container{min-width:580px;}
+a,a:active,a:hover,a:focus,.btn,.btn:focus,.btn:active{outline-width:0;outline-style:none;outline:none;}
+h3{font-size:20px;}
+#toTop{position:fixed;right:4%;bottom:-1px;padding:2px 15px 5px;background:#CC0000;border:1px solid #960000;-webkit-border-top-left-radius:5px;-webkit-border-top-right-radius:5px;-moz-border-radius-topleft:5px;-moz-border-radius-topright:5px;border-top-left-radius:5px;border-top-right-radius:5px;transition-property:padding,background-color,border-color;transition-duration:0.2s;box-shadow:0px 1px 0px rgba(255,255,255,0.3) inset;z-index:9999;}
+#toTop:hover{padding-bottom:12px;background:#FD0000;border:1px solid #C60000;}
+.table th,.table td{vertical-align:middle;}
+.table input,.table select,.table textarea{margin-top:0;margin-bottom:0;margin-right:5px;}
+form{padding-bottom:0;margin-bottom:0;}
+hr{margin-bottom:5px;}
+footer p{margin-bottom:20px;}
+.sortasc:after{display:block;float:right;content:"\25B2";cursor:pointer;}
+.sortdes:after{display:block;float:right;content:"\25BC";cursor:pointer;}
+#lan-grid input[type="text"],#lan-grid select,.langrid input[type="text"],.langrid select,.langrid textarea{width:90%;}
+.form-actions{margin-bottom:-40px;}
+.tomato-refresh{float:right;padding:5px 0;margin-right:5px;}
+#refresh-spinner{padding-right:5px;}
+.nav-header{display:block;padding:5px 18px 5px 10px;width:150px;color:#D50005;font-size:11px;font-weight:bold;text-decoration:none;background:#fff;border-left:1px solid #E1E1E1;border-right:1px solid #E1E1E1;}
+#bwm-controls{font-size:13px;}
+.fixtables tr td:first-child{width:40%;}
+.fixtables25 tr td:first-child{width:25%;}
+#ethPorts{display:block;position:relative;width:100%;height:100px;overflow:hidden;margin-bottom:15px auto;}
+#ethPorts .ethCable{position:absolute;z-index:2;top:71px;display:block;width:90%;margin-left:4%;height:8px;background:url('/img/ethernet.png') 0 -129px repeat-x;}
+#ethPorts .title{position:absolute;display:block;width:64px;top:-20px;text-align:center;}
+#ethPorts .speed{position:absolute;display:block;width:64px;bottom:-20px;text-align:center;}
+#ethPorts .eth{display:inline-block;position:relative;z-index:15;top:15px;width:64px;height:64px;margin-left:5%;}
+#ethPorts .eth.off{background:url('/img/ethernet.png') 0 -64px no-repeat;}
+#ethPorts .eth.on{background:url('/img/ethernet.png') 0 0 no-repeat;}
+#ethPorts .eth.wan{margin-right:15%;}
+#navigation{display:block;position:fixed;top:0;left:0;width:100%;margin:0;padding:0;height:40px;line-height:40px;box-shadow:0 0 4px rgba(0,0,0,0.5);-webkit-box-shadow:0 0 4px rgba(0,0,0,0.5);-moz-box-shadow:0 0 4px rgba(0,0,0,0.5);-o-box-shadow:0 0 4px rgba(0,0,0,0.5);background:#c60e15;background-image:-moz-linear-gradient(top,#d5121b,#af070d);background-image:-webkit-gradient(linear,0 0,0 100%,from(#d5121b),to(#af070d));background-image:-webkit-linear-gradient(top,#d5121b,#af070d);background-image:-o-linear-gradient(top,#d5121b,#af070d);background-image:linear-gradient(to bottom,#d5121b,#af070d);background-repeat:repeat-x;border-bottom:1px solid #ff3019;filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffd5121b',endColorstr='#ffaf070d',GradientType=0);z-index:100;}
+#navigation .logo{display:inline-block;float:left;font-size:20px;font-weight:200;margin:0 18px 0 0;padding:0;color:#ffffff;text-shadow:0px 1px 0px rgba(0,0,0,0.50);}
+#navigation .logo a{color:#ffffff;text-decoration:none;}
+#navigation .navi{display:inline-block;height:40px;}
+#navigation .navi > ul{list-style:none;padding:0;margin:0;}
+#navigation .navi > ul > li{float:left;height:40px;line-height:40px;position:relative;}
+#navigation .navi > ul > li > a{display:inline-block;color:#F5F5F5;font-size:13px;height:40px;padding:0 12px;transition:all 0.1s ease-out;-webkit-transition:all 0.1s ease-out;-o-transition:all 0.1s ease-out;-moz-transition:all 0.1s ease-out;text-shadow:0 1px 0 rgba(0,0,0,0.2);text-decoration:none;}
+#navigation .navi li:hover > a,#navigation .navi li:focus > a,#navigation .navi li.clicked > a{color:#fff;background:rgba(0,0,0,0.1);}
+#navigation .navi ul li ul{visibility:hidden;transition:all 0.1s 0.1s ease-out;-webkit-transition:all 0.1s ease-out;-o-transition:all 0.1s ease-out;-moz-transition:all 0.1s 0.1s ease-out;opacity:0;}
+#navigation .navi li:hover ul,#navigation .navi li.clicked > ul{opacity:1;visibility:visible;transition-delay:0s;-webkit-transition-delay:0s;-moz-transition-delay:0s;-o-transition-delay:0s;}
+#navigation .navi li ul{display:block;position:absolute;left:-25px;top:40px;width:auto;list-style:none;box-shadow:0 0 5px rgba(0,0,0,0.1);-webkit-box-shadow:0 0 5px rgba(0,0,0,0.1);-moz-box-shadow:0 0 5px rgba(0,0,0,0.1);padding-top:1px;}
+#navigation .navi li ul li a{display:block;color:#646464;padding:4px 14px;width:150px;text-decoration:none;font-size:12px;background:#fff;border-left:1px solid #E1E1E1;border-right:1px solid #E1E1E1;transition:all 0.1s ease-out;-webkit-transition:all 0.1s ease-out;-o-transition:all 0.1s ease-out;-moz-transition:all 0.1s ease-out;}
+#navigation .navi li ul li:last-child a{-webkit-border-bottom-left-radius:5px;-webkit-border-bottom-right-radius:5px;-moz-border-radius-bottomleft:5px;-moz-border-radius-bottomright:5px;border-bottom-left-radius:5px;border-bottom-right-radius:5px;border-bottom:1px solid #E1E1E1;}
+#navigation .navi li ul > li > a:hover{color:#000;background:#f5f5f5;}
+.anim-out{opacity:0;visibility:hidden;transition:opacity visibility 0.5s linear;-webkit-transition:opacity visibility 0.5s linear;-o-transition:opacity visibility 0.5s linear;-moz-transition:opacity visibility 0.5s linear;}
+.anim-in{visibility:visible;opacity:1;}
+@media (max-width:979px){body{padding-top:40px;}
+#toTop{right:1%;}
+.container{clear:both;}
+#navigation .logo{margin-right:5px;font-size:15px;font-weight:bold;}
+#navigation .navi > ul > li > a{padding:0 5px;}
+}
+@media (max-width:767px){body{padding-top:0;min-width:625px;}
+#navigation{width:100%;min-width:625px;position:relative;left:0;right:0;padding:0;margin-left:-20px;padding-right:25px;}
+#navigation .navi li ul{position:absolute;left:-100px;}
+#navigation .navi ul li:first-of-type ul{left:-25px;}
+#navigation .logo{display:none;}
+.container{width:600px;padding:0 15px;}
+}

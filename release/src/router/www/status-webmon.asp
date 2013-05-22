@@ -1,428 +1,451 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
+<!DOCTYPE html>
 <!--
-	Tomato GUI
+Tomato GUI
+Copyright (C) 2006-2010 Jonathan Zarate
+http://www.polarcloud.com/tomato/
 
-	For use with Tomato Firmware only.
-	No part of this file may be used without permission.
+For use with Tomato Firmware only.
+No part of this file may be used without permission.
 -->
-<html>
-<head>
-<meta http-equiv='content-type' content='text/html;charset=utf-8'>
-<meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Status: Web Usage</title>
-<link rel='stylesheet' type='text/css' href='tomato.css'>
-<link rel='stylesheet' type='text/css' href='color.css'>
-<script type='text/javascript' src='tomato.js'></script>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
 
-<!-- / / / -->
+        <meta http-equiv='content-type' content='text/html;charset=utf-8'>
+        <meta name='robots' content='noindex,nofollow'>
+        <title>[<% ident(); %>] Status: Web Usage</title>
 
-<style type='text/css'>
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/bootstrap-responsive.min.css" rel="stylesheet">
+        <link href="css/tomato.css" rel="stylesheet">
+        <% css(); %>
+        <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+        <!--[if lt IE 9]>
+        <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
 
-#webmon-controls {
-	text-align: right;
-	float: right;
-	margin-right: 5px;
-}
-#webmon-controls .selected {
-	padding: 0 0px 0 4px;
-	font-weight: bold;
-	text-decoration: underline;
-}
+        <script type="text/javascript" src="js/jquery.lite.min.js"></script>
 
-</style>
 
-<script type='text/javascript' src='debug.js'></script>
+        <script type='text/javascript' src='tomato.js'></script>
 
-<script type='text/javascript'>
+        <!-- / / / -->
 
-//	<% nvram("log_wm,log_wmdmax,log_wmsmax"); %>
+        <style type='text/css'>
 
-list = [];
-wm_domains = [];
-wm_searches = [];
+            #webmon-controls {
+                text-align: right;
+                float: right;
+                margin-right: 5px;
+            }
+            #webmon-controls .selected {
+                padding: 0 0px 0 4px;
+                font-weight: bold;
+                text-decoration: underline;
+            }
 
-var maxLimit = 0;
-var maxCount = 50;
-var lastMaxCount = -1;
+        </style>
 
-var queue = [];
-var xob = null;
-var cache = [];
-var new_cache = [];
-var lock = 0;
 
-function clearLog(clear)
-{
-	if (xob) return;
+        <script type='text/javascript'>
 
-	xob = new XmlHttp();
-	xob.onCompleted = function(text, xml) {
-		xob = null;
-		E('clear' + clear).innerHTML = '&raquo; <a href="javascript:clearLog(' + clear + ')">Clear</a>';
-		if (!ref.running) ref.once = 1;
-		ref.start();
-	}
-	xob.onError = function(ex) {
-		xob = null;
-	}
+            // <% nvram("at_update,tomatoanon_answer,log_wm,log_wmdmax,log_wmsmax"); %>
 
-	xob.post('webmon.cgi', 'clear=' + clear);
-	E('clear' + clear).innerHTML = 'Please wait... <img src="spin.gif" style="vertical-align:top">';
-}
+            list = [];
+            wm_domains = [];
+            wm_searches = [];
 
-function resolve()
-{
-	if ((queue.length == 0) || (xob)) return;
+            var maxLimit = 0;
+            var maxCount = 50;
+            var lastMaxCount = -1;
 
-	xob = new XmlHttp();
-	xob.onCompleted = function(text, xml) {
-		eval(text);
-		for (var i = 0; i < resolve_data.length; ++i) {
-			var r = resolve_data[i];
-			if (r[1] == '') r[1] = r[0];
-			cache[r[0]] = r[1];
-			if (lock == 0) {
-				dg.setName(r[0], r[1]);
-				sg.setName(r[0], r[1]);
-			}
-		}
-		xob = null;
-	}
-	xob.onError = function(ex) {
-		xob = null;
-	}
+            var queue = [];
+            var xob = null;
+            var cache = [];
+            var new_cache = [];
+            var lock = 0;
 
-	xob.post('resolve.cgi', 'ip=' + queue.splice(0, 20).join(','));
-}
+            function clearLog(clear)
+            {
+                if (xob) return;
 
-var ref = new TomatoRefresh('update.cgi', '', 0, 'status_webmon');
+                xob = new XmlHttp();
+                xob.onCompleted = function(text, xml) {
+                    xob = null;
+                    E('clear' + clear).innerHTML = '&raquo; <a href="javascript:clearLog(' + clear + ')">Clear</a>';
+                    if (!ref.running) ref.once = 1;
+                    ref.start();
+                }
+                xob.onError = function(ex) {
+                    xob = null;
+                }
 
-ref.refresh = function(text)
-{
-	++lock;
+                xob.post('/webmon.cgi', 'clear=' + clear);
+                E('clear' + clear).innerHTML = 'Please wait... <img src="spin.gif">';
+            }
 
-	try {
-		eval(text);
-	}
-	catch (ex) {
-		wm_domains = [];
-		wm_searches = [];
-	}
+            function resolve()
+            {
+                if ((queue.length == 0) || (xob)) return;
 
-	new_cache = [];
-	dg.populate();
-	sg.populate();
-	cache = new_cache;
-	new_cache = null;
+                xob = new XmlHttp();
+                xob.onCompleted = function(text, xml) {
+                    eval(text);
+                    for (var i = 0; i < resolve_data.length; ++i) {
+                        var r = resolve_data[i];
+                        if (r[1] == '') r[1] = r[0];
+                        cache[r[0]] = r[1];
+                        if (lock == 0) {
+                            dg.setName(r[0], r[1]);
+                            sg.setName(r[0], r[1]);
+                        }
+                    }
+                    xob = null;
+                }
+                xob.onError = function(ex) {
+                    xob = null;
+                }
 
-	--lock;
-}
+                xob.post('/resolve.cgi', 'ip=' + queue.splice(0, 20).join(','));
+            }
 
-function showSelectedOption(prev, curr)
-{
-	var e;
+            var ref = new TomatoRefresh('/update.cgi', '', 0, 'status_webmon');
 
-	elem.removeClass('mc' + prev, 'selected');	// safe if prev doesn't exist
-	if ((e = E('mc' + curr)) != null) {
-		elem.addClass(e, 'selected');
-		e.blur();
-	}
-}
+            ref.refresh = function(text)
+            {
+                ++lock;
 
-function showMaxCount()
-{
-	if (maxCount == lastMaxCount) return;
-	showSelectedOption(lastMaxCount, maxCount);
-	lastMaxCount = maxCount;
-	ref.postData = 'exec=webmon&arg0=' + maxCount;
-}
+                try {
+                    eval(text);
+                }
+                catch (ex) {
+                    wm_domains = [];
+                    wm_searches = [];
+                }
 
-function switchMaxCount(c)
-{
-	maxCount = c;
-	showMaxCount();
-	if (!ref.running) ref.once = 1;
-	ref.start();
-	cookie.set('webmon-maxcount', maxCount);
-}
+                new_cache = [];
+                dg.populate();
+                sg.populate();
+                cache = new_cache;
+                new_cache = null;
 
-function WMGrid() { return this; }
-WMGrid.prototype = new TomatoGrid;
+                --lock;
+            }
 
-WMGrid.prototype.resolveAll = function()
-{
-	var i, ip, row, q;
+            function showSelectedOption(prev, curr)
+            {
+                var e;
 
-	q = [];
-	queue = [];
-	for (i = 1; i < this.tb.rows.length; ++i) {
-		row = this.tb.rows[i];
-		ip = row.getRowData().ip;
-		if (ip.indexOf('<') == -1) {
-			if (!q[ip]) {
-				q[ip] = 1;
-				queue.push(ip);
-			}
-			row.style.cursor = 'wait';
-		}
-	}
-	q = null;
-	resolve();
-}
+                elem.removeClass('mc' + prev, 'selected');	// safe if prev doesn't exist
+                if ((e = E('mc' + curr)) != null) {
+                    elem.addClass(e, 'selected');
+                    e.blur();
+                }
+            }
 
-WMGrid.prototype.onClick = function(cell)
-{
-	if ((cell.cellIndex || 0) == 2 /* url */) return;
+            function showMaxCount()
+            {
+                if (maxCount == lastMaxCount) return;
+                showSelectedOption(lastMaxCount, maxCount);
+                lastMaxCount = maxCount;
+                ref.postData = 'exec=webmon&arg0=' + maxCount;
+            }
 
-	var row = PR(cell);
-	var ip = row.getRowData().ip;
-	if (this.lastClicked != row) {
-		this.lastClicked = row;
-		queue = [];
-		if (ip.indexOf('<') == -1) {
-			queue.push(ip);
-			row.style.cursor = 'wait';
-			resolve();
-		}
-	}
-	else {
-		this.resolveAll();
-	}
-}
+            function switchMaxCount(c)
+            {
+                maxCount = c;
+                showMaxCount();
+                if (!ref.running) ref.once = 1;
+                ref.start();
+                cookie.set('webmon-maxcount', maxCount);
+            }
 
-WMGrid.prototype.setName = function(ip, name)
-{
-	var i, row, data;
+            function WMGrid() { return this; }
+            WMGrid.prototype = new TomatoGrid;
 
-	for (i = this.tb.rows.length - 1; i > 0; --i) {
-		row = this.tb.rows[i];
-		data = row.getRowData();
-		if (data.ip == ip) {
-			data[1] = name + ((ip.indexOf(':') != -1) ? '<br>' : ' ') + '<small>(' + ip + ')</small>';
-			row.setRowData(data);
-			row.cells[1].innerHTML = data[1];
-			row.style.cursor = 'default';
-		}
-	}
-}
+            WMGrid.prototype.resolveAll = function()
+            {
+                var i, ip, row, q;
 
-WMGrid.prototype.populateData = function(data, url)
-{
-	var a, e, i;
-	var maxl = 45;
-	var cursor;
+                q = [];
+                queue = [];
+                for (i = 1; i < this.tb.rows.length; ++i) {
+                    row = this.tb.rows[i];
+                    ip = row.getRowData().ip;
+                    if (ip.indexOf('<') == -1) {
+                        if (!q[ip]) {
+                            q[ip] = 1;
+                            queue.push(ip);
+                        }
+                        row.style.cursor = 'wait';
+                    }
+                }
+                q = null;
+                resolve();
+            }
 
-	list = [];
-	this.lastClicked = null;
-	this.removeAllData();
-	for (i = 0; i < list.length; ++i) {
-		list[i].time = 0;
-		list[i].ip = '';
-		list[i].value = '';
-	}
+            WMGrid.prototype.onClick = function(cell)
+            {
+                if ((cell.cellIndex || 0) == 2 /* url */) return;
 
-	for (i = data.length - 1; i >= 0; --i) {
-		a = data[i];
-		e = {
-			time: a[0],
-			ip: a[1],
-			value: a[2] + ''
-		};
-		list.push(e);
-	}
+                var row = PR(cell);
+                var ip = row.getRowData().ip;
+                if (this.lastClicked != row) {
+                    this.lastClicked = row;
+                    queue = [];
+                    if (ip.indexOf('<') == -1) {
+                        queue.push(ip);
+                        row.style.cursor = 'wait';
+                        resolve();
+                    }
+                }
+                else {
+                    this.resolveAll();
+                }
+            }
 
-	var dt = new Date();
-	for (i = list.length - 1; i >= 0; --i) {
-		e = list[i];
-/* IPV6-BEGIN */
-		a = CompressIPv6Address(e.ip);
-		if (a != null) e.ip = a;
-/* IPV6-END */
-		if (cache[e.ip] != null) {
-			new_cache[e.ip] = cache[e.ip];
-			e.ip = cache[e.ip] + ((e.ip.indexOf(':') != -1) ? '<br>' : ' ') + '<small>(' + e.ip + ')</small>';
-			cursor = 'default';
-		}
-		else cursor = null;
-		if (url != 0) {
-			e.value = '<a href="http://' + e.value + '" target="_new">' +
-				(e.value.length > maxl + 3 ? e.value.substr(0, maxl) + '...' : e.value) + '</a>';
-		}
-		else {
-			e.value = e.value.replace(/\+/g, ' ');
-			if (e.value.length > maxl + 3)
-				e.value = e.value.substr(0, maxl) + '...';
-		}
-		dt.setTime(e.time * 1000);
-		var row = this.insert(-1, e, [dt.toDateString() + ', ' + dt.toLocaleTimeString(),
-			e.ip, e.value], false);
-		if (cursor) row.style.cursor = cursor;
-	}
+            WMGrid.prototype.setName = function(ip, name)
+            {
+                var i, row, data;
 
-	list = [];
-	this.resort();
-	this.recolor();
-}
+                for (i = this.tb.rows.length - 1; i > 0; --i) {
+                    row = this.tb.rows[i];
+                    data = row.getRowData();
+                    if (data.ip == ip) {
+                        data[1] = name + ((ip.indexOf(':') != -1) ? '<br>' : ' ') + '<small>(' + ip + ')</small>';
+                        row.setRowData(data);
+                        row.cells[1].innerHTML = data[1];
+                        row.style.cursor = 'default';
+                    }
+                }
+            }
 
-WMGrid.prototype.sortCompare = function(a, b)
-{
-	var col = this.sortColumn;
-	var ra = a.getRowData();
-	var rb = b.getRowData();
-	var r;
+            WMGrid.prototype.populateData = function(data, url)
+            {
+                var a, e, i;
+                var maxl = 45;
+                var cursor;
 
-	switch (col) {
-	case 0:
-		r = -cmpInt(ra.time, rb.time);
-		break;
-	case 1:
-		var aip = fixIP(ra.ip);
-		var bip = fixIP(rb.ip);
-		if ((aip != null) && (bip != null)) {
-			r = aton(aip) - aton(bip);
-			break;
-		}
-		// fall
-	default:
-		r = cmpText(a.cells[col].innerHTML, b.cells[col].innerHTML);
-	}
-	return this.sortAscending ? r : -r;
-}
+                list = [];
+                this.lastClicked = null;
+                this.removeAllData();
+                for (i = 0; i < list.length; ++i) {
+                    list[i].time = 0;
+                    list[i].ip = '';
+                    list[i].value = '';
+                }
 
-var dg = new WMGrid();
+                for (i = data.length - 1; i >= 0; --i) {
+                    a = data[i];
+                    e = {
+                        time: a[0],
+                        ip: a[1],
+                        value: a[2] + ''
+                    };
+                    list.push(e);
+                }
 
-dg.setup = function() {
-	this.init('dom-grid', 'sort');
-	this.headerSet(['Last Access Time', 'IP Address', 'Domain Name']);
-	this.sort(0);
-}
+                var dt = new Date();
+                for (i = list.length - 1; i >= 0; --i) {
+                    e = list[i];
+                    /* IPV6-BEGIN */
+                    a = CompressIPv6Address(e.ip);
+                    if (a != null) e.ip = a;
+                    /* IPV6-END */
+                    if (cache[e.ip] != null) {
+                        new_cache[e.ip] = cache[e.ip];
+                        e.ip = cache[e.ip] + ((e.ip.indexOf(':') != -1) ? '<br>' : ' ') + '<small>(' + e.ip + ')</small>';
+                        cursor = 'default';
+                    }
+                    else cursor = null;
+                    if (url != 0) {
+                        e.value = '<a href="http://' + e.value + '" target="_new">' +
+                        (e.value.length > maxl + 3 ? e.value.substr(0, maxl) + '...' : e.value) + '</a>';
+                    }
+                    else {
+                        e.value = e.value.replace(/\+/g, ' ');
+                        if (e.value.length > maxl + 3)
+                            e.value = e.value.substr(0, maxl) + '...';
+                    }
+                    dt.setTime(e.time * 1000);
+                    var row = this.insert(-1, e, [dt.toDateString() + ', ' + dt.toLocaleTimeString(),
+                            e.ip, e.value], false);
+                    if (cursor) row.style.cursor = cursor;
+                }
 
-dg.populate = function() {
-	this.populateData(wm_domains, 1);
-}
+                list = [];
+                this.resort();
+                this.recolor();
+            }
 
-var sg = new WMGrid();
+            WMGrid.prototype.sortCompare = function(a, b)
+            {
+                var col = this.sortColumn;
+                var ra = a.getRowData();
+                var rb = b.getRowData();
+                var r;
 
-sg.setup = function() {
-	this.init('srh-grid', 'sort');
-	this.headerSet(['Search Time', 'IP Address', 'Search Criteria']);
-	this.sort(0);
-}
+                switch (col) {
+                    case 0:
+                        r = -cmpInt(ra.time, rb.time);
+                        break;
+                    case 1:
+                    var aip = fixIP(ra.ip);
+                    var bip = fixIP(rb.ip);
+                    if ((aip != null) && (bip != null)) {
+                        r = aton(aip) - aton(bip);
+                        break;
+                    }
+                    // fall
+                    default:
+                        r = cmpText(a.cells[col].innerHTML, b.cells[col].innerHTML);
+                }
+                return this.sortAscending ? r : -r;
+            }
 
-sg.populate = function() {
-	this.populateData(wm_searches, 0);
-}
+            var dg = new WMGrid();
 
-function init()
-{
-	ref.initPage();
+            dg.setup = function() {
+                this.init('dom-grid', 'sort');
+                this.headerSet(['Last Access Time', 'IP Address', 'Domain Name']);
+                this.sort(0);
+            }
 
-	if (!ref.running) ref.once = 1;
-	ref.start();
-}
+            dg.populate = function() {
+                this.populateData(wm_domains, 1);
+            }
 
-function earlyInit()
-{
-	if (nvram.log_wm == '1' && (nvram.log_wmdmax != '0' || nvram.log_wmsmax != '0')) {
-		E('webmon').style.display = '';
-		E('wm-disabled').style.display = 'none';
+            var sg = new WMGrid();
 
-		maxLimit = nvram.log_wmdmax * 1;
-		if (nvram.log_wmsmax * 1 > maxLimit) maxLimit = nvram.log_wmsmax * 1;
-		if (maxLimit <= 10)
-			E('webmon-mc').style.display = 'none';
-		else {
-			if (maxLimit <= 50) E('mc50').style.display = 'none';
-			if (maxLimit <= 100) E('mc100').style.display = 'none';
-			if (maxLimit <= 200) E('mc200').style.display = 'none';
-			if (maxLimit <= 500) E('mc500').style.display = 'none';
-			if (maxLimit <= 1000) E('mc1000').style.display = 'none';
-			if (maxLimit <= 2000) E('mc2000').style.display = 'none';
-			if (maxLimit <= 5000) E('mc5000').style.display = 'none';
-		}
+            sg.setup = function() {
+                this.init('srh-grid', 'sort');
+                this.headerSet(['Search Time', 'IP Address', 'Search Criteria']);
+                this.sort(0);
+            }
 
-		if (nvram.log_wmdmax == '0') E('webmon-domains').style.display = 'none';
-		if (nvram.log_wmsmax == '0') E('webmon-searches').style.display = 'none';
-	}
-	dg.setup();
-	sg.setup();
+            sg.populate = function() {
+                this.populateData(wm_searches, 0);
+            }
 
-	maxCount = fixInt(cookie.get('webmon-maxcount'), 0, maxLimit, 50);
-	showMaxCount();
-}
-</script>
+            function init()
+            {
+                ref.initPage();
 
-</head>
-<body onload='init()'>
-<form id='_fom' action='javascript:{}'>
-<table id='container' cellspacing=0>
-<tr><td colspan=2 id='header'>
-	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
-</td></tr>
-<tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
-<td id='content'>
-<div id='ident'><% ident(); %></div>
+                if (!ref.running) ref.once = 1;
+                ref.start();
+            }
 
-<!-- / / / -->
+            function earlyInit()
+            {
+                if (nvram.log_wm == '1' && (nvram.log_wmdmax != '0' || nvram.log_wmsmax != '0')) {
+                    E('webmon').style.display = '';
+                    E('wm-disabled').style.display = 'none';
 
-<div id='webmon' style='display:none'>
-	<div id='webmon-domains'>
-		<div class='section-title'>Recently Visited Web Sites</div>
-		<div class='section'>
-			<table id='dom-grid' class='tomato-grid' style="float:left" cellspacing=1></table>
-			&raquo; <a href="webmon_recent_domains?_http_id=<% nv(http_id) %>">Download</a>
-			<div style="float:right;text-align:right;margin-right:5px" id="clear1">
-				&raquo; <a href="javascript:clearLog(1)">Clear</a>
-			</div>
-		</div>
-	</div>
+                    maxLimit = nvram.log_wmdmax * 1;
+                    if (nvram.log_wmsmax * 1 > maxLimit) maxLimit = nvram.log_wmsmax * 1;
+                    if (maxLimit <= 10)
+                        E('webmon-mc').style.display = 'none';
+                    else {
+                        if (maxLimit <= 20) E('mc20').style.display = 'none';
+                        if (maxLimit <= 50) E('mc50').style.display = 'none';
+                        if (maxLimit <= 100) E('mc100').style.display = 'none';
+                        if (maxLimit <= 200) E('mc200').style.display = 'none';
+                        if (maxLimit <= 500) E('mc500').style.display = 'none';
+                        if (maxLimit <= 1000) E('mc1000').style.display = 'none';
+                        if (maxLimit <= 2000) E('mc2000').style.display = 'none';
+                        if (maxLimit <= 5000) E('mc5000').style.display = 'none';
+                    }
 
-	<div id='webmon-searches'>
-		<div class='section-title'>Recent Web Searches</div>
-		<div class='section'>
-			<table id='srh-grid' class='tomato-grid' style="float:left" cellspacing=1></table>
-			&raquo; <a href="webmon_recent_searches?_http_id=<% nv(http_id) %>">Download</a>
-			<div style="float:right;text-align:right;margin-right:5px" id="clear2">
-				&raquo; <a href="javascript:clearLog(2)">Clear</a>
-			</div>
-		</div>
-	</div>
+                    if (nvram.log_wmdmax == '0') E('webmon-domains').style.display = 'none';
+                    if (nvram.log_wmsmax == '0') E('webmon-searches').style.display = 'none';
+                }
+                dg.setup();
+                sg.setup();
 
-	<div id='webmon-controls'>
-		<div id='webmon-mc'>
-			Show up to&nbsp;
-			<a href='javascript:switchMaxCount(10);' id='mc10'>10,</a>
-			<a href='javascript:switchMaxCount(50);' id='mc50'>50,</a>
-			<a href='javascript:switchMaxCount(100);' id='mc100'>100,</a>
-			<a href='javascript:switchMaxCount(200);' id='mc200'>200,</a>
-			<a href='javascript:switchMaxCount(500);' id='mc500'>500,</a>
-			<a href='javascript:switchMaxCount(1000);' id='mc1000'>1000,</a>
-			<a href='javascript:switchMaxCount(2000);' id='mc2000'>2000,</a>
-			<a href='javascript:switchMaxCount(5000);' id='mc5000'>5000,</a>
-			<a href='javascript:switchMaxCount(0);' id='mc0'>All</a>&nbsp;
-			<small>available entries</small>
-		</div>
-		&raquo; <a href="admin-log.asp">Web Monitor Configuration</a>
-		<br><br>
-		<script type='text/javascript'>genStdRefresh(1,3,'ref.toggle()');</script>
-	</div>
-</div>
+                maxCount = fixInt(cookie.get('webmon-maxcount'), 0, maxLimit, 50);
+                showMaxCount();
+            }
+        </script>
 
-<div id='wm-disabled'>
-	<b>Web Monitoring disabled.</b>
-	<br><br>
-	<a href="admin-log.asp">Enable &raquo;</a>
-	<br><br>
-</div>
+    </head>
+    <body onload='init()'>
+        <div id="navigation">
+            <div class="container">
+                <div class="logo"><a href="/">AdvancedTomato</a></div>
+                <div class="navi">
+                    <ul>
+                        <script type="text/javascript">navi()</script>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div id="main" class="container">
+            <div class="row">
+                <div class="span12">
 
-<script type='text/javascript'>earlyInit();</script>
+                    <!-- / / / -->
 
-<!-- / / / -->
+                    <div id="webmon" style="display:none">
+                        <div id="webmon-domains">
+                            <h3>Recently Visited Web Sites</h3>
+                            <div class="section">
+                                <table id="dom-grid" class="table table-striped table-condensed table-bordered"></table>
+                                &raquo; <a href="webmon_recent_domains?_http_id=<% nv(http_id) %>">Download</a>
+                                <div id="clear1">
+                                    &raquo; <a href="javascript:clearLog(1)">Clear</a>
+                                </div>
+                            </div>
+                        </div>
 
-</td></tr>
-<tr><td id='footer' colspan=2>&nbsp;</td></tr>
-</table>
-</form>
-</body>
+                        <div id="webmon-searches">
+                            <h3>Recent Web Searches</h3>
+                            <div class="section">
+                                <table id="srh-grid" class="table table-striped table-condensed table-bordered"></table>
+                                &raquo; <a href="webmon_recent_searches?_http_id=<% nv(http_id) %>">Download</a>
+                                <div id="clear2">
+                                    &raquo; <a href="javascript:clearLog(2)">Clear</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="webmon-controls">
+                            <div id="webmon-mc">
+                                Show up to&nbsp;
+                                <a href="javascript:switchMaxCount(10);" id="mc10">10,</a>
+                                <a href="javascript:switchMaxCount(20);" id="mc20">20,</a>
+                                <a href="javascript:switchMaxCount(50);" id="mc50">50,</a>
+                                <a href="javascript:switchMaxCount(100);" id="mc100">100,</a>
+                                <a href="javascript:switchMaxCount(200);" id="mc200">200,</a>
+                                <a href="javascript:switchMaxCount(500);" id="mc500">500,</a>
+                                <a href="javascript:switchMaxCount(1000);" id="mc1000">1000,</a>
+                                <a href="javascript:switchMaxCount(2000);" id="mc2000">2000,</a>
+                                <a href="javascript:switchMaxCount(5000);" id="mc5000">5000,</a>
+                                <a href="javascript:switchMaxCount(0);" id="mc0">All</a>&nbsp;
+                                <small>available entries</small>
+                            </div>
+                            &raquo; <a href="admin-log.asp">Web Monitor Configuration</a>
+                            <br><br>
+                            <script type="text/javascript">genStdRefresh(1,1,"ref.toggle()");</script>
+                        </div>
+                    </div>
+
+                    <div id="wm-disabled" class="alert alert-info">
+                        <b>Web Monitoring disabled.</b><br />
+                        <a href="admin-log.asp">Enable &raquo;</a>
+                    </div>
+
+                    <script type="text/javascript">earlyInit();</script>
+
+                    <!-- / / / -->
+
+                </div><!--/span-->
+            </div><!--/row-->
+            <hr>
+<div class="footer">
+                <p><a href="about.asp">&copy; AdvancedTomato 2013</a> <span style="padding: 0 15px; float:right; text-align:right;">Version: <b><% version(1); %></b></span></p> 
+            </div>
+
+        </div><!--/.fluid-container-->
+
+    </body>
 </html>

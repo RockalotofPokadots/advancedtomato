@@ -1,229 +1,247 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
+<!DOCTYPE html>
 <!--
-	Tomato GUI
-	Copyright (C) 2006-2010 Jonathan Zarate
-	http://www.polarcloud.com/tomato/
+Tomato GUI
+Copyright (C) 2006-2010 Jonathan Zarate
+http://www.polarcloud.com/tomato/
 
-	For use with Tomato Firmware only.
-	No part of this file may be used without permission.
+For use with Tomato Firmware only.
+No part of this file may be used without permission.
 -->
-<html>
-<head>
-<meta http-equiv='content-type' content='text/html;charset=utf-8'>
-<meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Tools: Trace</title>
-<link rel='stylesheet' type='text/css' href='tomato.css'>
-<link rel='stylesheet' type='text/css' href='color.css'>
-<script type='text/javascript' src='tomato.js'></script>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
 
-<!-- / / / -->
-<style type='text/css'>
-#ttr-grid .co1, #ttr-grid .co3 {
-	text-align: right;
-}
-#ttr-grid .co1 {
-	width: 30px;
-}
-#ttr-grid .co2 {
-	width: 410px;
-}
-#ttr-grid .co4, #ttr-grid .co5, #ttr-grid .co6 {
-	text-align: right;
-	width: 70px;
-}
-#ttr-grid .header .co1 {
-	text-align: left;
-}
-</style>
+        <meta http-equiv='content-type' content='text/html;charset=utf-8'>
+        <meta name='robots' content='noindex,nofollow'>
+        <title>[<% ident(); %>] Tools: Trace</title>
 
-<script type='text/javascript' src='debug.js'></script>
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/bootstrap-responsive.min.css" rel="stylesheet">
+        <link href="css/tomato.css" rel="stylesheet">
+        <% css(); %>
 
-<script type='text/javascript'>
-//	<% nvram(''); %>	// http_id
 
-var tracedata = '';
+        <script type="text/javascript" src="js/jquery.lite.min.js"></script>
 
-var tg = new TomatoGrid();
-tg.setup = function() {
-	this.init('ttr-grid');
-	this.headerSet(['Hop', 'Address', 'Min (ms)', 'Max (ms)', 'Avg (ms)', '+/- (ms)']);
-}
-tg.populate = function() {
-	var seq = 1;
-	var buf = tracedata.split('\n');
-	var i, j, k;
-	var s, f;
-	var addr, emsg, min, max, avg;
-	var time;
-	var last = -1;
 
-	this.removeAllData();
-	for (i = 0; i < buf.length; ++i) {
-		if (!buf[i].match(/^\s*(\d+)\s+(.+)$/)) continue;
-		if (RegExp.$1 != seq) continue;
 
-		s = RegExp.$2;
+        <script type="text/javascript" src="tomato.js"></script>
 
-		if (s.match(/^([\w\.:\-]+)\s+\(([\d\.:A-Fa-f]+)\)/)) {
-			addr = RegExp.$1;
-			if (addr != RegExp.$2) addr += ' (' + RegExp.$2 + ')';
-		}
-		else addr = '*';
+        <!-- / / / -->
+        <style type="text/css">
+            #ttr-grid .co1, #ttr-grid .co3 {
+                text-align: right;
+            }
+            #ttr-grid .co1 {
+                width: 30px;
+            }
+            #ttr-grid .co2 {
+                width: 410px;
+            }
+            #ttr-grid .co4, #ttr-grid .co5, #ttr-grid .co6 {
+                text-align: right;
+                width: 70px;
+            }
+            #ttr-grid .header .co1 {
+                text-align: left;
+            }
+        </style>
 
-		min = max = avg = '';
-		change = '';
-		if (time = s.match(/(\d+\.\d+) ms/g)) {		// odd: captures 'ms'
-			min = 0xFFFF;
-			avg = max = 0;
-			k = 0;
-			for (j = 0; j < time.length; ++j) {
-				f = parseFloat(time[j]);
-				if (isNaN(f)) continue;
-				if (f < min) min = f;
-				if (f > max) max = f;
-				avg += f;
-				++k
-			}
-			if (k) {
-				avg /= k;
-				if (last >= 0) {
-					change = avg - last;
-					change = change.toFixed(2);
-				}
-				last = avg;
-				min = min.toFixed(2);
-				max = max.toFixed(2);
-				avg = avg.toFixed(2);
-			}
-			else {
-				min = max = avg = '';
-				last = -1;
-			}
-		}
-		else last = -1;
+        <script type="text/javascript">
+            //	<% nvram('at_update,tomatoanon_answer'); %>	// http_id
 
-		if (s.match(/ (![<>\w+-]+)/)) emsg = RegExp.$1;
-			else emsg = null;
+            var tracedata = '';
 
-		this.insertData(-1, [seq, addr, min, max, avg, change])
-		++seq;
-	}
+            var tg = new TomatoGrid();
+            tg.setup = function() {
+                this.init('ttr-grid');
+                this.headerSet(['Hop', 'Address', 'Min (ms)', 'Max (ms)', 'Avg (ms)', '+/- (ms)']);
+            }
+            tg.populate = function() {
+                var seq = 1;
+                var buf = tracedata.split('\n');
+                var i, j, k;
+                var s, f;
+                var addr, emsg, min, max, avg;
+                var time;
+                var last = -1;
 
-	E('debug').value = tracedata;
-	tracedata = '';
-	spin(0);
-}
+                this.removeAllData();
+                for (i = 0; i < buf.length; ++i) {
+                    if (!buf[i].match(/^\s*(\d+)\s+(.+)$/)) continue;
+                    if (RegExp.$1 != seq) continue;
 
-function verifyFields(focused, quiet)
-{
-	var s;
-	var e;
+                    s = RegExp.$2;
 
-	e = E('_f_addr');
-	s = e.value.trim();
-	if (!s.match(/^[\w\.-]+$/)) {
-		ferror.set(e, 'Invalid address', quiet);
-		return 0;
-	}
-	ferror.clear(e);
+                    if (s.match(/^([\w\.:\-]+)\s+\(([\d\.:A-Fa-f]+)\)/)) {
+                        addr = RegExp.$1;
+                        if (addr != RegExp.$2) addr += ' (' + RegExp.$2 + ')';
+                    }
+                    else addr = '*';
 
-	return v_range('_f_hops', quiet, 2, 40) && v_range('_f_wait', quiet, 2, 10);
-}
+                    min = max = avg = '';
+                    change = '';
+                    if (time = s.match(/(\d+\.\d+) ms/g)) {		// odd: captures 'ms'
+                        min = 0xFFFF;
+                        avg = max = 0;
+                        k = 0;
+                        for (j = 0; j < time.length; ++j) {
+                            f = parseFloat(time[j]);
+                            if (isNaN(f)) continue;
+                            if (f < min) min = f;
+                            if (f > max) max = f;
+                            avg += f;
+                            ++k
+                        }
+                        if (k) {
+                            avg /= k;
+                            if (last >= 0) {
+                                change = avg - last;
+                                change = change.toFixed(2);
+                            }
+                            last = avg;
+                            min = min.toFixed(2);
+                            max = max.toFixed(2);
+                            avg = avg.toFixed(2);
+                        }
+                        else {
+                            min = max = avg = '';
+                            last = -1;
+                        }
+                    }
+                    else last = -1;
 
-var tracer = null;
+                    if (s.match(/ (![<>\w+-]+)/)) emsg = RegExp.$1;
+                    else emsg = null;
 
-function spin(x)
-{
-	E('traceb').disabled = x;
-	E('_f_addr').disabled = x;
-	E('_f_hops').disabled = x;
-	E('_f_wait').disabled = x;
-	E('wait').style.visibility = x ? 'visible' : 'hidden';
-	if (!x) tracer = null;
-}
+                    this.insertData(-1, [seq, addr, min, max, avg, change])
+                    ++seq;
+                }
 
-function trace()
-{
-	// Opera 8 sometimes sends 2 clicks
-	if (tracer) return;
+                E('debug').value = tracedata;
+                tracedata = '';
+                spin(0);
+            }
 
-	if (!verifyFields(null, 0)) return;
-	spin(1);
-	E('trace-error').style.visibility = 'hidden';
+            function verifyFields(focused, quiet)
+            {
+                var s;
+                var e;
 
-	tracer = new XmlHttp();
-	tracer.onCompleted = function(text, xml) {
-		eval(text);
-		tg.populate();
-	}
-	tracer.onError = function(x) {
-		spin(0);
-		E('trace-error').innerHTML = 'ERROR: ' + E('_f_addr').value + ' - ' + x;
-		E('trace-error').style.visibility = 'visible';
-	}
+                e = E('_f_addr');
+                s = e.value.trim();
+                if (!s.match(/^[\w\.-]+$/)) {
+                    ferror.set(e, 'Invalid address', quiet);
+                    return 0;
+                }
+                ferror.clear(e);
 
-	var addr = E('_f_addr').value;
-	var hops = E('_f_hops').value;
-	var wait = E('_f_wait').value;
-	tracer.post('trace.cgi', 'addr=' + addr + '&hops=' + hops + '&wait=' + wait);
+                return v_range('_f_hops', quiet, 2, 40) && v_range('_f_wait', quiet, 2, 10);
+            }
 
-	cookie.set('traceaddr', addr);
-	cookie.set('tracehops', hops);
-	cookie.set('tracewait', wait);
-}
+            var tracer = null;
 
-function init()
-{
-	var s;
+            function spin(x)
+            {
+                E('traceb').disabled = x;
+                E('_f_addr').disabled = x;
+                E('_f_hops').disabled = x;
+                E('_f_wait').disabled = x;
+                E('wait').style.visibility = x ? 'visible' : 'hidden';
+                if (!x) tracer = null;
+            }
 
-	if ((s = cookie.get('traceaddr')) != null) E('_f_addr').value = s;
-	if ((s = cookie.get('tracehops')) != null) E('_f_hops').value = s;
-	if ((s = cookie.get('tracewait')) != null) E('_f_wait').value = s;
+            function trace()
+            {
+                // Opera 8 sometimes sends 2 clicks
+                if (tracer) return;
 
-	E('_f_addr').onkeypress = function(ev) { if (checkEvent(ev).keyCode == 13) trace(); }
-}
-</script>
+                if (!verifyFields(null, 0)) return;
+                spin(1);
+                E('trace-error').style.visibility = 'hidden';
 
-</head>
-<body onload='init()'>
-<form action='javascript:{}'>
-<table id='container' cellspacing=0>
-<tr><td colspan=2 id='header'>
-	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
-</td></tr>
-<tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
-<td id='content'>
-<div id='ident'><% ident(); %></div>
+                tracer = new XmlHttp();
+                tracer.onCompleted = function(text, xml) {
+                    eval(text);
+                    tg.populate();
+                }
+                tracer.onError = function(x) {
+                    spin(0);
+                    E('trace-error').innerHTML = 'ERROR: ' + E('_f_addr').value + ' - ' + x;
+                    E('trace-error').style.visibility = 'visible';
+                }
 
-<!-- / / / -->
+                var addr = E('_f_addr').value;
+                var hops = E('_f_hops').value;
+                var wait = E('_f_wait').value;
+                tracer.post('trace.cgi', 'addr=' + addr + '&hops=' + hops + '&wait=' + wait);
 
-<div class='section-title'>Traceroute</div>
-<div class='section'>
-<script type='text/javascript'>
-createFieldTable('', [
-	{ title: 'Address', name: 'f_addr', type: 'text', maxlen: 64, size: 32, value: '', suffix: ' <input type="button" value="Trace" onclick="trace()" id="traceb">' },
-	{ title: 'Maximum Hops', name: 'f_hops', type: 'text', maxlen: 2, size: 4, value: '20' },
-	{ title: 'Maximum Wait Time', name: 'f_wait', type: 'text', maxlen: 2, size: 4, value: '3', suffix: ' <small>(seconds per hop)</small>' }
-]);
-</script>
-</div>
+                cookie.set('traceaddr', addr);
+                cookie.set('tracehops', hops);
+                cookie.set('tracewait', wait);
+            }
 
-<div style='visibility:hidden' id='trace-error'></div>
+            function init()
+            {
+                var s;
 
-<div style='visibility:hidden;text-align:right' id='wait'>Please wait... <img src='spin.gif' style='vertical-align:top'></div>
+                if ((s = cookie.get('traceaddr')) != null) E('_f_addr').value = s;
+                if ((s = cookie.get('tracehops')) != null) E('_f_hops').value = s;
+                if ((s = cookie.get('tracewait')) != null) E('_f_wait').value = s;
 
-<table id='ttr-grid' class='tomato-grid' cellspacing=1></table>
+                E('_f_addr').onkeypress = function(ev) { if (checkEvent(ev).keyCode == 13) trace(); }
+            }
+        </script>
 
-<div style='height:10px;' onclick='javascript:E("debug").style.display=""'></div>
-<textarea id='debug' style='width:99%;height:300px;display:none'></textarea>
+    </head>
+    <body onload='init()'>
+        <div id="navigation">
+            <div class="container">
+                <div class="logo"><a href="/">AdvancedTomato</a></div>
+                <div class="navi">
+                    <ul>
+                        <script type="text/javascript">navi()</script>
+                    </ul>
+                </div>
+            </div>
+        </div>
 
-<!-- / / / -->
+        <div id="main" class="container">
+            <div class="row">
+                <div class="span12">
 
-</td></tr>
-<tr><td id='footer' colspan=2>&nbsp;</td></tr>
-</table>
-</form>
-<script type='text/javascript'>tg.setup();</script>
-</body>
+                    <!-- / / / -->
+
+                    <h3>Traceroute</h3>
+                    <div class='section'>
+                        <script type='text/javascript'>
+                            createFieldTable('', [
+                                    { title: 'Address', name: 'f_addr', type: 'text', maxlen: 64, size: 32, value: '', suffix: ' <button type="submit" value="Trace" onclick="trace()" id="traceb" class="btn">Trace</button>' },
+                                    { title: 'Maximum Hops', name: 'f_hops', type: 'text', maxlen: 2, size: 4, value: '20' },
+                                    { title: 'Maximum Wait Time', name: 'f_wait', type: 'text', maxlen: 2, size: 4, value: '3', suffix: ' <small>(seconds per hop)</small>' }
+                                ]);
+                        </script>
+                    </div>
+
+                    <div style='visibility:hidden' id='trace-error'></div>
+
+                    <div style='visibility:hidden;text-align:right' id='wait'>Please wait... <img src="spin.gif"></div>
+
+                    <table id='ttr-grid' class='table table-striped table-condensed table-bordered'></table>
+
+                    <div style='height:10px;' onclick='javascript:E("debug").style.display=""'></div>
+                    <textarea id='debug' style='width:99%;height:300px;display:none'></textarea>
+
+                    <!-- / / / -->
+
+                    <div id='footer'></div>
+                </div><!--/span-->
+            </div><!--/row-->
+            <hr>
+<div class="footer">
+                <p><a href="about.asp">&copy; AdvancedTomato 2013</a> <span style="padding: 0 15px; float:right; text-align:right;">Version: <b><% version(1); %></b></span></p> 
+            </div>
+        </div><!--/.fluid-container-->
+        <script type='text/javascript'>tg.setup();</script>
+    </body>
 </html>

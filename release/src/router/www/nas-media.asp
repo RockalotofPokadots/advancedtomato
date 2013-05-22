@@ -1,333 +1,344 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
+<!DOCTYPE html>
 <!--
-	Tomato GUI
-	Media Server Settings - !!TB
+Tomato GUI
+Media Server Settings - !!TB
 
-	For use with Tomato Firmware only.
-	No part of this file may be used without permission.
+For use with Tomato Firmware only.
+No part of this file may be used without permission.
 -->
-<html>
-<head>
-<meta http-equiv='content-type' content='text/html;charset=utf-8'>
-<meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] NAS: Media Server</title>
-<link rel='stylesheet' type='text/css' href='tomato.css'>
-<link rel='stylesheet' type='text/css' href='color.css'>
-<script type='text/javascript' src='tomato.js'></script>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="content-type" content="text/html;charset=utf-8">
+        <meta name="robots" content="noindex,nofollow">
+        <title>[<% ident(); %>] NAS: Media Server</title>
 
-<!-- / / / -->
 
-<style tyle='text/css'>
-#ms-grid {
-	width: 81%;
-}
-#ms-grid .co1 {
-	width: 56%;
-}
-#ms-grid .co2 {
-	width: 44%;
-}
-</style>
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/bootstrap-responsive.min.css" rel="stylesheet">
+        <link href="css/tomato.css" rel="stylesheet">
+        <% css(); %>
 
-<script type='text/javascript' src='debug.js'></script>
 
-<script type='text/javascript'>
+        <script type="text/javascript" src="js/jquery.lite.min.js"></script>
+        <script type="text/javascript" src="tomato.js"></script>
 
-//	<% nvram("ms_enable,ms_port,ms_dirs,ms_dbdir,ms_tivo,ms_stdlna,ms_sas,cifs1,cifs2,jffs2_on"); %>
+        <!-- / / / -->
 
-changed = 0;
-mdup = parseInt('<% psup("minidlna"); %>');
+        <style tyle="text/css">
+            #ms-grid {
+                width: 81%;
+            }
+            #ms-grid .co1 {
+                width: 56%;
+            }
+            #ms-grid .co2 {
+                width: 44%;
+            }
+        </style>
 
-var mediatypes = [['', 'All Media Files'], ['A', 'Audio only'], ['V', 'Video only'], ['P', 'Images only']];
-var msg = new TomatoGrid();
+        <script type="text/javascript">
 
-msg.dataToView = function(data) {
-	var b = [];
-	var i;
+            //	<% nvram("at_update,tomatoanon_answer,ms_enable,ms_port,ms_dirs,ms_dbdir,ms_tivo,ms_stdlna,ms_sas,cifs1,cifs2,jffs2_on"); %>
 
-	b.push(escapeHTML('' + data[0]));
-	for (i = 0; i < mediatypes.length; ++i)
-		if (mediatypes[i][0] == ('' + data[1])) {
-			b.push(mediatypes[i][1]);
-			break;
-		}
-	if (b.length < 2) b.push(mediatypes[0][1]);
-	return b;
-}
+            changed = 0;
+            mdup = parseInt('<% psup("minidlna"); %>');
 
-msg.verifyFields = function(row, quiet)
-{
-	var ok = 1;
-	var f;
-	f = fields.getAll(row);
+            var mediatypes = [['', 'All Media Files'], ['A', 'Audio only'], ['V', 'Video only'], ['P', 'Images only']];
+            var msg = new TomatoGrid();
 
-	if (!v_nodelim(f[0], quiet, 'Directory', 1) || !v_path(f[0], quiet, 1))
-		ok = 0;
+            msg.dataToView = function(data) {
+                var b = [];
+                var i;
 
-	changed |= ok;
-	return ok;
-}
+                b.push(escapeHTML('' + data[0]));
+                for (i = 0; i < mediatypes.length; ++i)
+                if (mediatypes[i][0] == ('' + data[1])) {
+                    b.push(mediatypes[i][1]);
+                    break;
+                }
+                if (b.length < 2) b.push(mediatypes[0][1]);
+                return b;
+            }
 
-msg.resetNewEditor = function()
-{
-	var f;
+            msg.verifyFields = function(row, quiet)
+            {
+                var ok = 1;
+                var f;
+                f = fields.getAll(row);
 
-	f = fields.getAll(this.newEditor);
-	ferror.clearAll(f);
-	f[0].value = '';
-	f[1].selectedIndex = 0;
-}
+                if (!v_nodelim(f[0], quiet, 'Directory', 1) || !v_path(f[0], quiet, 1))
+                    ok = 0;
 
-msg.setup = function()
-{
-	this.init('ms-grid', 'sort', 50, [
-		{ type: 'text', maxlen: 256 },
-		{ type: 'select', options: mediatypes }
-	]);
-	this.headerSet(['Directory', 'Content Filter']);
+                changed |= ok;
+                return ok;
+            }
 
-	var s = ('' + nvram.ms_dirs).split('>');
-	for (var i = 0; i < s.length; ++i) {
-		var t = s[i].split('<');
-		if (t.length == 2) this.insertData(-1, t);
-	}
+            msg.resetNewEditor = function()
+            {
+                var f;
 
-	this.sort(0);
-	this.showNewEditor();
-	this.resetNewEditor();
-}
+                f = fields.getAll(this.newEditor);
+                ferror.clearAll(f);
+                f[0].value = '';
+                f[1].selectedIndex = 0;
+            }
 
-function getDbPath()
-{
-	var s = E('_f_loc').value;
-	return (s == '*user') ? E('_f_user').value : s;
-}
+            msg.setup = function()
+            {
+                this.init('ms-grid', 'sort', 50, [
+                        { type: 'text', maxlen: 256 },
+                        { type: 'select', options: mediatypes }
+                    ]);
+                this.headerSet(['Directory', 'Content Filter']);
 
-function verifyFields(focused, quiet)
-{
-	var ok = 1;
-	var a, b, v;
-	var eLoc, eUser;
+                var s = ('' + nvram.ms_dirs).split('>');
+                for (var i = 0; i < s.length; ++i) {
+                    var t = s[i].split('<');
+                    if (t.length == 2) this.insertData(-1, t);
+                }
 
-	elem.display('_restart_button', nvram.ms_enable == '1');
+                this.sort(0);
+                this.showNewEditor();
+                this.resetNewEditor();
+            }
 
-	a = E('_f_ms_enable').checked ? 1 : 0;
+            function getDbPath()
+            {
+                var s = E('_f_loc').value;
+                return (s == '*user') ? E('_f_user').value : s;
+            }
 
-	eLoc = E('_f_loc');
-	eUser = E('_f_user');
+            function verifyFields(focused, quiet)
+            {
+                var ok = 1;
+                var a, b, v;
+                var eLoc, eUser;
 
-	eLoc.disabled = (a == 0);
-	eUser.disabled = (a == 0);
-	E('_ms_port').disabled = (a == 0);
-	E('_f_ms_sas').disabled = (a == 0);
-	E('_f_ms_rescan').disabled = (a == 0);
-	E('_f_ms_tivo').disabled = (a == 0);
-	E('_f_ms_stdlna').disabled = (a == 0);
-	E('_restart_button').disabled = (a == 0);
+                elem.display('_restart_button', nvram.ms_enable == '1');
 
-	ferror.clear(eLoc);
-	ferror.clear(eUser);
+                a = E('_f_ms_enable').checked ? 1 : 0;
 
-	v = eLoc.value;
-	b = (v == '*user');
-	elem.display(eUser, b);
-	elem.display(PR('_f_ms_sas'), (v != ''));
+                eLoc = E('_f_loc');
+                eUser = E('_f_user');
 
-	if (a == 0) {
-		if (focused != E('_f_ms_rescan'))
-			changed |= ok;
-		return ok;
-	}
-	if (b) {
-		if (!v_path(eUser, quiet || !ok, 1)) ok = 0;
-	}
-/* JFFS2-BEGIN */
-	else if (v == '/jffs/dlna') {
-		if (nvram.jffs2_on != '1') {
-			ferror.set(eLoc, 'JFFS is not enabled.', quiet || !ok);
-			ok = 0;
-		}
-		else ferror.clear(eLoc);
-	}
-/* JFFS2-END */
-/* REMOVE-BEGIN */
-/* CIFS-BEGIN */
-	else if (v.match(/^\/cifs(1|2)\/dlna$/)) {
-		if (nvram['cifs' + RegExp.$1].substr(0, 1) != '1') {
-			ferror.set(eLoc, 'CIFS #' + RegExp.$1 + ' is not enabled.', quiet || !ok);
-			ok = 0;
-		}
-		else ferror.clear(eLoc);
-	}
-/* CIFS-END */
-/* REMOVE-END */
+                eLoc.disabled = (a == 0);
+                eUser.disabled = (a == 0);
+                E('_f_ms_sas').disabled = (a == 0);
+                E('_f_ms_rescan').disabled = (a == 0);
+                E('_f_ms_tivo').disabled = (a == 0);
+                E('_f_ms_stdlna').disabled = (a == 0);
+                E('_restart_button').disabled = (a == 0);
 
-	if (focused != E('_f_ms_rescan'))
-		changed |= ok;
-	return ok;
-}
+                ferror.clear(eLoc);
+                ferror.clear(eUser);
 
-function save()
-{
-	if (msg.isEditing()) return;
-	if (!verifyFields(null, 0)) return;
+                v = eLoc.value;
+                b = (v == '*user');
+                elem.display(eUser, b);
+                elem.display(PR('_f_ms_sas'), (v != ''));
 
-	var fom = E('_fom');
+                if (a == 0) {
+                    if (focused != E('_f_ms_rescan'))
+                        changed |= ok;
+                    return ok;
+                }
+                if (b) {
+                    if (!v_path(eUser, quiet || !ok, 1)) ok = 0;
+                }
+                /* JFFS2-BEGIN */
+                else if (v == '/jffs/dlna') {
+                    if (nvram.jffs2_on != '1') {
+                        ferror.set(eLoc, 'JFFS is not enabled.', quiet || !ok);
+                        ok = 0;
+                    }
+                    else ferror.clear(eLoc);
+                }
+                /* JFFS2-END */
+                /* REMOVE-BEGIN */
+                /* CIFS-BEGIN */
+                else if (v.match(/^\/cifs(1|2)\/dlna$/)) {
+                    if (nvram['cifs' + RegExp.$1].substr(0, 1) != '1') {
+                        ferror.set(eLoc, 'CIFS #' + RegExp.$1 + ' is not enabled.', quiet || !ok);
+                        ok = 0;
+                    }
+                    else ferror.clear(eLoc);
+                }
+                /* CIFS-END */
+                /* REMOVE-END */
 
-	fom.ms_enable.value = E('_f_ms_enable').checked ? 1 : 0;
-	fom.ms_tivo.value = E('_f_ms_tivo').checked ? 1 : 0;
-	fom.ms_stdlna.value = E('_f_ms_stdlna').checked ? 1 : 0;
-	fom.ms_rescan.value = E('_f_ms_rescan').checked ? 1 : 0;
-	fom.ms_sas.value = E('_f_ms_sas').checked ? 1 : 0;
+                if (focused != E('_f_ms_rescan'))
+                    changed |= ok;
+                return ok;
+            }
 
-	fom.ms_dbdir.value = getDbPath();
+            function save()
+            {
+                if (msg.isEditing()) return;
+                if (!verifyFields(null, 0)) return;
 
-	var data = msg.getAllData();
-	var r = [];
-	for (var i = 0; i < data.length; ++i) r.push(data[i].join('<'));
-	fom.ms_dirs.value = r.join('>');
+                var fom = E('_fom');
 
-	form.submit(fom, 1);
-}
+                fom.ms_enable.value = E('_f_ms_enable').checked ? 1 : 0;
+                fom.ms_tivo.value = E('_f_ms_tivo').checked ? 1 : 0;
+                fom.ms_stdlna.value = E('_f_ms_stdlna').checked ? 1 : 0;
+                fom.ms_rescan.value = E('_f_ms_rescan').checked ? 1 : 0;
+                fom.ms_sas.value = E('_f_ms_sas').checked ? 1 : 0;
 
-function restart(isup)
-{
-	if (changed) {
-		if (!confirm("Unsaved changes will be lost. Continue anyway?")) return;
-	}
-	E('_restart_button').disabled = true;
-	form.submitHidden('tomato.cgi', {
-		ms_rescan: E('_f_ms_rescan').checked ? 1 : 0,
-		_reboot: 0, _commit: 0, _nvset: 1,
-		_redirect: 'nas-media.asp',
-		_sleep: '3',
-		_service: 'media-' + (isup ? 're' : '') + 'start'
-	});
-}
+                fom.ms_dbdir.value = getDbPath();
 
-function submit_complete()
-{
-	reloadPage();
-}
+                var data = msg.getAllData();
+                var r = [];
+                for (var i = 0; i < data.length; ++i) r.push(data[i].join('<'));
+                fom.ms_dirs.value = r.join('>');
 
-var xob = null;
+                form.submit(fom, 1);
+            }
 
-function setNoticeText(s)
-{
-	if (s.length)
-		s = '<div id="notice1">' + s.replace(/\n/g, '<br>') + '</div><br style="clear:both">';
-	elem.setInnerHTML('notice-msg', s);
-}
+            function restart(isup)
+            {
+                if (changed) {
+                    if (!confirm("Unsaved changes will be lost. Continue anyway?")) return;
+                }
+                E('_restart_button').disabled = true;
+                form.submitHidden('tomato.cgi', {
+                        ms_rescan: E('_f_ms_rescan').checked ? 1 : 0,
+                        _reboot: 0, _commit: 0, _nvset: 1,
+                        _redirect: 'nas-media.asp',
+                        _sleep: '3',
+                        _service: 'media-' + (isup ? 're' : '') + 'start'
+                });
+            }
 
-function updateNotice()
-{
-	if (xob) return;
+            function submit_complete()
+            {
+                reloadPage();
+            }
 
-	xob = new XmlHttp();
-	xob.onCompleted = function(text, xml) {
-		setNoticeText(text);
-		xob = null;
-		setTimeout(updateNotice, 5000);
-	}
-	xob.onError = function(ex) { xob = null; }
-	xob.post('update.cgi', 'exec=notice&arg0=dlna');
-}
+            var xob = null;
 
-function init()
-{
-	changed = 0;
-	updateNotice();
-}
-</script>
+            function setNoticeText(s)
+            {
+                if (s.length)
+                    s = '<div id="notice1">' + s.replace(/\n/g, '<br>') + '</div><br style="clear:both">';
+                elem.setInnerHTML('notice-msg', s);
+            }
 
-</head>
-<body onload="init()">
-<form id='_fom' method='post' action='tomato.cgi'>
-<table id='container' cellspacing=0>
-<tr><td colspan=2 id='header'>
-	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
-</td></tr>
-<tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
-<td id='content'>
-<div id='ident'><% ident(); %></div>
+            function updateNotice()
+            {
+                if (xob) return;
 
-<!-- / / / -->
+                xob = new XmlHttp();
+                xob.onCompleted = function(text, xml) {
+                    setNoticeText(text);
+                    xob = null;
+                    setTimeout(updateNotice, 5000);
+                }
+                xob.onError = function(ex) { xob = null; }
+                xob.post('/update.cgi', 'exec=notice&arg0=dlna');
+            }
 
-<input type='hidden' name='_nextpage' value='nas-media.asp'>
-<input type='hidden' name='_service' value='media-restart'>
+            function init()
+            {
+                changed = 0;
+                updateNotice();
+            }
+        </script>
 
-<input type='hidden' name='ms_enable'>
-<input type='hidden' name='ms_dirs'>
-<input type='hidden' name='ms_dbdir'>
-<input type='hidden' name='ms_tivo'>
-<input type='hidden' name='ms_stdlna'>
-<input type='hidden' name='ms_rescan'>
-<input type='hidden' name='ms_sas'>
+    </head>
+    <body onload="init()">
+        <div id="navigation">
+            <div class="container">
+                <div class="logo"><a href="/">AdvancedTomato</a></div>
+                <div class="navi">
+                    <ul>
+                        <script type="text/javascript">navi()</script>
+                    </ul>
+                </div>
+            </div>
+        </div>
 
-<div class='section-title'>Media / DLNA Server</div>
-<div class='section'>
-<script type='text/javascript'>
+        <div id="main" class="container">
+            <div class="row">
+                <div class="span12">
 
-switch (nvram.ms_dbdir) {
-	case '':
-	case '/jffs/dlna':
-	case '/cifs1/dlna':
-	case '/cifs2/dlna':
-		loc = nvram.ms_dbdir;
-		break;
-	default:
-		loc = '*user';
-		break;
-}
+                    <!-- / / / -->
+                    <form id="_fom" method="post" action="tomato.cgi">
+                        <input type="hidden" name="_nextpage" value="nas-media.asp">
+                        <input type="hidden" name="_service" value="media-restart">
 
-createFieldTable('', [
-	{ title: 'Enable', name: 'f_ms_enable', type: 'checkbox', value: nvram.ms_enable == '1' },
-	{ title: 'Port', name: 'ms_port', type: 'text', maxlen: 5, size: 6, value: nvram.ms_port, suffix: '<small>(range: 0 - 65535; default (random) set 0)</small>' },
-	{ title: 'Database Location', multi: [
-		{ name: 'f_loc', type: 'select', options: [['','RAM (Temporary)'],
+                        <input type="hidden" name="ms_enable">
+                        <input type="hidden" name="ms_dirs">
+                        <input type="hidden" name="ms_dbdir">
+                        <input type="hidden" name="ms_tivo">
+                        <input type="hidden" name="ms_stdlna">
+                        <input type="hidden" name="ms_rescan">
+                        <input type="hidden" name="ms_sas">
 
-/* JFFS2-BEGIN */
-			['/jffs/dlna','JFFS'],
-/* JFFS2-END */
-/* REMOVE-BEGIN */
-/* CIFS-BEGIN */
-			['/cifs1/dlna','CIFS 1'],['/cifs2/dlna','CIFS 2'],
-/* CIFS-END */
-/* REMOVE-END */
-			['*user','Custom Path']], value: loc },
-		{ name: 'f_user', type: 'text', maxlen: 256, size: 60, value: nvram.ms_dbdir }
-	] },
-	{ title: 'Scan Media at Startup*', indent: 2, name: 'f_ms_sas', type: 'checkbox', value: nvram.ms_sas == '1', hidden: 1 },
-	{ title: 'Rescan on the next run*', indent: 2, name: 'f_ms_rescan', type: 'checkbox', value: 0,
-		suffix: '<br><small>* Media scan may take considerable time to complete.</small>' },
-	null,
-	{ title: 'TiVo Support', name: 'f_ms_tivo', type: 'checkbox', value: nvram.ms_tivo == '1' },
-	{ title: 'Strictly adhere to DLNA standards', name: 'f_ms_stdlna', type: 'checkbox', value: nvram.ms_stdlna == '1' }
-]);
-W('<br><input type="button" value="' + (mdup ? 'Res' : 'S') + 'tart Now" onclick="restart(mdup)" id="_restart_button">');
-</script>
-</div>
-<span id="notice-msg"></span>
-<br>
+                        <h3>Media / DLNA Server</h3>
+                        <div class="section">
+                            <script type="text/javascript">
 
-<div class='section-title'>Media Directories</div>
-<div class='section'>
-	<table class='tomato-grid' cellspacing=1 id='ms-grid'></table>
-	<script type='text/javascript'>msg.setup();</script>
-<br>
-</div>
+                                switch (nvram.ms_dbdir) {
+                                    case '':
+                                    case '/jffs/dlna':
+                                    case '/cifs1/dlna':
+                                    case '/cifs2/dlna':
+                                        loc = nvram.ms_dbdir;
+                                        break;
+                                    default:
+                                        loc = '*user';
+                                        break;
+                                }
 
-<!-- / / / -->
+                                createFieldTable('', [
+                                        { title: 'Enable', name: 'f_ms_enable', type: 'checkbox', value: nvram.ms_enable == '1' },
+                                        { title: 'Database Location', multi: [
+                                                { name: 'f_loc', type: 'select', options: [['','RAM (Temporary)'],
+                                                        /* JFFS2-BEGIN */
+                                                        ['/jffs/dlna','JFFS'],
+                                                        /* JFFS2-END */
+                                                        /* REMOVE-BEGIN */
+                                                        /* CIFS-BEGIN */
+                                                        ['/cifs1/dlna','CIFS 1'],['/cifs2/dlna','CIFS 2'],
+                                                        /* CIFS-END */
+                                                        /* REMOVE-END */
+                                                        ['*user','Custom Path']], value: loc },
+                                                { name: 'f_user', type: 'text', maxlen: 256, size: 60, value: nvram.ms_dbdir }
+                                            ] },
+                                        { title: 'Scan Media at Startup*', indent: 2, name: 'f_ms_sas', type: 'checkbox', value: nvram.ms_sas == '1', hidden: 1 },
+                                        { title: 'Rescan on the next run*', indent: 2, name: 'f_ms_rescan', type: 'checkbox', value: 0,
+                                            suffix: '<br><small>* Media scan may take considerable time to complete.</small>' },
+                                        null,
+                                        { title: 'TiVo Support', name: 'f_ms_tivo', type: 'checkbox', value: nvram.ms_tivo == '1' },
+                                        { title: 'Strictly adhere to DLNA standards', name: 'f_ms_stdlna', type: 'checkbox', value: nvram.ms_stdlna == '1' }
+                                    ]);
+                                W('<br><input type="button" value="' + (mdup ? 'Res' : 'S') + 'tart Now" onclick="restart(mdup)" id="_restart_button" class="btn">');
+                            </script>
+                        </div>
+                        <span id="notice-msg"></span>
 
-</td></tr>
-<tr><td id='footer' colspan=2>
-	<span id='footer-msg'></span>
-	<input type='button' value='Save' id='save-button' onclick='save()'>
-	<input type='button' value='Cancel' id='cancel-button' onclick='javascript:reloadPage();'>
-</td></tr>
-</table>
-</form>
-<script type='text/javascript'>verifyFields(null, 1);</script>
-</body>
+                        <h3>Media Directories</h3>
+                        <div class="section">
+                            <table class="table table-striped table-condensed table-bordered langrid" id="ms-grid"></table>
+                            <script type="text/javascript">msg.setup();</script>
+                            <br>
+                        </div>
+
+                        <br />
+                        <button type="button" value="Save" id="save-button" onclick="save()" class="btn btn-primary">Save</button>
+                        <button type="button" value="Cancel" id="cancel-button" onclick="javascript:reloadPage();" class="btn">Cancel</button>
+                        &nbsp; <span id="footer-msg" class="alert warning" style="visibility: hidden;"></span>
+
+                    </form>
+
+                </div><!--/span-->
+            </div><!--/row-->
+            <hr>
+<div class="footer">
+                <p><a href="about.asp">&copy; AdvancedTomato 2013</a> <span style="padding: 0 15px; float:right; text-align:right;">Version: <b><% version(1); %></b></span></p> 
+            </div>
+        </div><!--/.fluid-container-->
+        <script type='text/javascript'>verifyFields(null, 1);</script>
+    </body>
 </html>

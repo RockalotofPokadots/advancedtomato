@@ -1072,6 +1072,10 @@ static const nvset_t nvset_list[] = {
 	{ "tomatoanon_cru",		V_RANGE(1, 12)			},
 	{ "tomatoanon_id",		V_LENGTH(0, 32)			},
 
+// AdvancedTomato
+	{ "at_update",			V_LENGTH(0,32)			},
+	{ "at_navigation",		V_LENGTH(0,32)			},
+
 // nas-usb - !!TB
 #ifdef TCONFIG_USB
 	{ "usb_enable",			V_01				},

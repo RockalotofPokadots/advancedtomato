@@ -1,143 +1,128 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
+<!DOCTYPE html>
 <!--
-	Tomato GUI
-	Copyright (C) 2006-2010 Jonathan Zarate
-	http://www.polarcloud.com/tomato/
+Tomato GUI
+Copyright (C) 2006-2010 Jonathan Zarate
+http://www.polarcloud.com/tomato/
 
-	For use with Tomato Firmware only.
-	No part of this file may be used without permission.
+For use with Tomato Firmware only.
+No part of this file may be used without permission.
 -->
-<html>
-<head>
-<meta http-equiv='content-type' content='text/html;charset=utf-8'>
-<meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Admin: Upgrade</title>
-<link rel='stylesheet' type='text/css' href='tomato.css'>
-<link rel='stylesheet' type='text/css' href='color.css'>
-<script type='text/javascript' src='tomato.js'></script>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="content-type" content="text/html;charset=utf-8">
+        <meta name="robots" content="noindex,nofollow">
+        <title>[<% ident(); %>] Admin: Upgrade</title>
 
-<!-- / / / -->
-<style type='text/css'>
-#afu-progress {
-	text-align: center;
-	padding: 200px 0;
-	width: 890px;
-}
-#afu-time {
-	font-size: 26px;
-}
-</style>
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/bootstrap-responsive.min.css" rel="stylesheet">
+        <link href="css/tomato.css" rel="stylesheet">
+        <% css(); %>
 
-<script type='text/javascript' src='debug.js'></script>
 
-<script type='text/javascript'>
+        <script type="text/javascript" src="js/jquery.lite.min.js"></script>
+        <script type="text/javascript" src="tomato.js"></script>
+        <script type="text/javascript">
+            // <% nvram("jffs2_on"); %>
+            function clock()
+            {
+                var t = ((new Date()).getTime() - startTime) / 1000;
+                elem.setInnerHTML('afu-time', Math.floor(t / 60) + ':' + Number(Math.floor(t % 60)).pad(2));
+            }
+            function upgrade()
+            {
+                var name;
+                var i;
+                var fom = document.form_upgrade;
+                var ext;
+                name = fixFile(fom.file.value);
+                if (name.search(/\.(bin|trx|chk)$/i) == -1) {
+                    alert('Expecting a ".bin", ".trx" or ".chk" file.');
+                    return false;
+                }
+                if (!confirm('Are you sure you want to upgrade using ' + name + '?')) return;
+                E('afu-upgrade-button').disabled = true;
+                elem.display('afu-input', false);
+                elem.display('afu-progress', true);
+                startTime = (new Date()).getTime();
+                setInterval('clock()', 800);
+                fom.action += '?_reset=' + (E('f_reset').checked ? "1" : "0");
+                form.addIdAction(fom);
+                fom.submit();
+            }
+        </script>
 
-// <% nvram("jffs2_on"); %>
+    </head>
+    <body>
+        <div id="navigation">
+            <div class="container">
+                <div class="logo"><a href="/">AdvancedTomato</a></div>
+                <div class="navi">
+                    <ul>
+                        <script type="text/javascript">navi()</script>
+                    </ul>
+                </div>
+            </div>
+        </div>
 
-function clock()
-{
-	var t = ((new Date()).getTime() - startTime) / 1000;
-	elem.setInnerHTML('afu-time', Math.floor(t / 60) + ':' + Number(Math.floor(t % 60)).pad(2));
-}
+        <div id="main" class="container">
+            <div class="row">
+                <div class="span12">
 
-function upgrade()
-{
-	var name;
-	var i;
-	var fom = document.form_upgrade;
-	var ext;
+                    <div id="afu-input">
+                        <h3>Upgrade Firmware</h3>
+                        <div class="section">
+                            <form name="form_upgrade" method="post" action="upgrade.cgi" encType="multipart/form-data">
+                                <label>Select the file to use:</label>
+                                <input type="file" name="file" size="50"> <button type="button" value="Upgrade" id="afu-upgrade-button" onclick="upgrade()" class="btn btn-danger">Upgrade</button>
+                            </form>
+                            <br><form name="form_reset" action="javascript:{}">
+                                <div id="reset-input">
+                                    <label class="checkbox">
+                                        <input type="checkbox" id="f_reset">&nbsp;&nbsp;After flashing, erase all data in NVRAM memory
+                                    </label>
+                                </div>
+                            </form>
 
-	name = fixFile(fom.file.value);
-	if (name.search(/\.(bin|trx|chk)$/i) == -1) {
-		alert('Expecting a ".bin" or ".trx" file.');
-		return;
-	}
-	if (!confirm('Are you sure you want to upgrade using ' + name + '?')) return;
+                            <br>
+                            <table class="table table-striped table-condensed table-bordered">
+                                <tr><td>Current Version:</td><td>&nbsp; <% version(1); %> <small></td></tr>
+                                <script type="text/javascript">
+                                    //	<% sysinfo(); %>
+                                    W('<tr><td>Free Memory:</td><td>&nbsp; ' + scaleSize(sysinfo.totalfreeram) + ' &nbsp; <small>(aprox. size that can be buffered completely in RAM)</small></td></tr>');
+                                </script>
+                            </table>
 
-	E('afu-upgrade-button').disabled = true;
+                        </div>
+                    </div>
 
-	elem.display('afu-input', false);
-	E('content').style.verticalAlign = 'middle';
-	elem.display('afu-progress', true);
-	elem.display('navi', false)
-	elem.display('ident', false)
 
-	startTime = (new Date()).getTime();
-	setInterval('clock()', 800);
+                    <div id="afu-progress" style="display:none;margin:auto" class="alert alert-info">
+                        <img src="spin.gif" style="vertical-align:baseline"> &nbsp; <span id="afu-time">0:00</span><br>
+                        Please wait while the firmware is uploaded &amp; flashed.<br>
+                        <b>Warning:</b> Do not interrupt this browser or the router!<br>
+                    </div>
 
-	fom.action += '?_reset=' + (E('f_reset').checked ? "1" : "0");
-	form.addIdAction(fom);
-	fom.submit();
-}
-</script>
-
-</head>
-<body>
-<table id='container' cellspacing=0>
-<tr><td colspan=2 id='header'>
-	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
-</td></tr>
-<tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
-<td id='content'>
-<div id='ident'><% ident(); %></div>
-
-<!-- / / / -->
-
-<div id='afu-input'>
-	<div class='section-title'>Upgrade Firmware</div>
-	<div class='section'>
-		<form name='form_upgrade' method='post' action='upgrade.cgi' encType='multipart/form-data'>
-		<div id='box-input'>
-			Select the file to use:<br>
-			<input type='file' name='file' size='50' style='height:20px'> <input type='button' value='Upgrade' id='afu-upgrade-button' onclick='upgrade()' style='height:20px'>
-		</div>
-		</form>
-		<br><form name='form_reset' action='javascript:{}'>
-		<div id='reset-input'>
-			<input type='checkbox' id='f_reset'>&nbsp;&nbsp;After flashing, erase all data in NVRAM memory
-		</div>
-		</form>
-
-		<br>
-		<table border=0>
-		<tr><td>Current Version:</td><td>&nbsp; <% version(1); %></td></tr>
-		<script type='text/javascript'>
-		//	<% sysinfo(); %>
-		W('<tr><td>Free Memory:</td><td>&nbsp; ' + scaleSize(sysinfo.totalfreeram) + ' &nbsp; <small>(aprox. size that can be buffered completely in RAM)</small></td></tr>');
-		</script>
-		</table>
-
-	</div>
-</div>
-
-/* JFFS2-BEGIN */
-<div class='note-disabledw' style='display:none' id='jwarn'>
-<b>Cannot upgrade if JFFS is enabled.</b><br><br>
-An upgrade may overwrite the JFFS partition currently in use. Before upgrading,
-please backup the contents of the JFFS partition, disable it, then reboot the router.<br><br><br>
-<a href='admin-jffs2.asp'>Disable &raquo;</a>
-</div>
-/* JFFS2-END */
-
-<div id='afu-progress' style='display:none;margin:auto'>
-	<img src='spin.gif' style='vertical-align:baseline'> <span id='afu-time'>0:00</span><br>
-	Please wait while the firmware is uploaded &amp; flashed.<br>
-	<b>Warning:</b> Do not interrupt this browser or the router!<br>
-</div>
-
-<!-- / / / -->
-
-</td></tr>
-<tr><td id='footer' colspan=2>&nbsp;</td></tr>
-</table>
-/* JFFS2-BEGIN */
-<script type='text/javascript'>
-if (nvram.jffs2_on != '0') {
-	E('jwarn').style.display = '';
-	E('afu-input').style.display = 'none';
-}
-</script>
-/* JFFS2-END */
-</body>
+                    /* JFFS2-BEGIN */
+                    <div class="note-disabledw alert alert-error" style="display:none;" id="jwarn">
+                        <b>Cannot upgrade if JFFS is enabled.</b><br />
+                        An upgrade may overwrite the JFFS partition currently in use. Before upgrading,
+                        please backup the contents of the JFFS partition, disable it, then reboot the router.<br>
+                        <a href="admin-jffs2.asp">Disable &raquo;</a>
+                    </div>
+                    <script type="text/javascript">
+                        if (nvram.jffs2_on != '0') {
+                            E('jwarn').style.display = '';
+                            E('afu-input').style.display = 'none';
+                        }
+                    </script>
+                    /* JFFS2-END */
+                </div><!--/span-->
+            </div><!--/row-->
+            <hr>
+<div class="footer">
+                <p><a href="about.asp">&copy; AdvancedTomato 2013</a> <span style="padding: 0 15px; float:right; text-align:right;">Version: <b><% version(1); %></b></span></p> 
+            </div>
+        </div><!--/.fluid-container-->
+    </body>
 </html>

@@ -683,6 +683,10 @@ const defaults_t defaults[] = {
 	{ "tomatoanon_cru",		"6"				},
 	{ "tomatoanon_id",		""				},
 
+// AdvancedTomato
+	{ "at_update",			""				},
+	{ "at_navigation",		"top"				},
+
 #ifdef TCONFIG_USB
 // nas-usb - !!TB
 	{ "usb_enable",			"1"				},

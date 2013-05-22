@@ -28,7 +28,7 @@ if [ "$ANON_ANSWER" == "1" ]; then
     if [ "$ANON_ENABLED" == "1" ]; then
 
         #Collect datas
-        MOD=Shibby
+        MOD=AdvancedTomato
         UPTIME=`uptime | cut -d "," -f1 | cut -d " " -f4,5`
         WANMAC=`nvram get wan_hwaddr`
         LANMAC=`nvram get lan_hwaddr`
@@ -80,6 +80,14 @@ if [ "$ANON_ANSWER" == "1" ]; then
         wget -O /dev/null $ANONSEND
 
         #Thanks
+
+
+        # AdvancedTomato Update Notification Script
+        # Get Latest version from server
+        wget -O "/tmp/AT-version" "http://at.prahec.com/update.php?v=$VER"
+        ATSERVER=`cat /tmp/AT-version`
+        rm /tmp/AT-version
+        nvram set at_update="$ATSERVER"
 
         INTERVAL=`nvram get tomatoanon_cru`
 
