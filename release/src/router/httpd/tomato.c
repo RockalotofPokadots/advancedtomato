@@ -425,12 +425,17 @@ static void asp_css(int argc, char **argv)
 {
 	const char *css = nvram_safe_get("web_css");
 	const char *ttb = nvram_safe_get("ttb_css");
+	const char *navi = nvram_safe_get("at_navigation");
 
+	if( strcmp(navi, "top") == 0 ) {
+		web_printf("<link rel=\"stylesheet\" type=\"text/css\" href=\"css/%s.css\">", navi);
+	}
+	
 	if( nvram_match( "web_css", "online" ) ) {
-		web_printf("<link rel='stylesheet' type='text/css' href='ext/%s.css'>", ttb);
+		web_printf("<link rel=\"stylesheet\" type=\"text/css\" href=\"ext/%s.css\">", ttb);
 	} else {
 		if (strcmp(css, "tomato") != 0) {
-			web_printf("<link rel='stylesheet' type='text/css' href='%s.css'>", css);
+			web_printf("<link rel=\"stylesheet\" type=\"text/css\" href=\"%s.css\">", css);
 		}
 	}
 }
