@@ -271,8 +271,3 @@ endif
 	for F in $(wildcard *.js *.jsx); do \
 		[ -f $(INSTALLDIR)/www/$$F ] && $(TOP)/www/remcoms2.sh $(INSTALLDIR)/www/$$F c; \
 	done
-    
-cd js/
-    for F in $(wildcard *.js *.jsx); do \
-        [ -f $(INSTALLDIR)/www/js/$$F ] && $(TOP)/www/remcoms2.sh $(INSTALLDIR)/www/js/$$F c; \
-    done
