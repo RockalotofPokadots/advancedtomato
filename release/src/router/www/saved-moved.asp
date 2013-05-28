@@ -62,7 +62,7 @@ No part of this file may be used without permission.
             }
         </script>
     </head>
-    <body onload="tick()" style="background: url('img/bg.jpg')" onclick='go()'>
+    <body onload="tick()" style="background: url('img/bg.png')" onclick='go()'>
         <div id="loader">
         <img src="spin.gif" align="left">
             The router's new IP address is <% nv("lan_ipaddr"); %>.<br /> You may need to release then renew your computer's DHCP lease before continuing.

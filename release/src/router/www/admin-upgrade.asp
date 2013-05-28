@@ -42,7 +42,6 @@ No part of this file may be used without permission.
                 }
                 if (!confirm('Are you sure you want to upgrade using ' + name + '?')) return;
                 E('afu-upgrade-button').disabled = true;
-                elem.display('afu-input', false);
                 elem.display('afu-progress', true);
                 startTime = (new Date()).getTime();
                 setInterval('clock()', 800);
@@ -97,7 +96,7 @@ No part of this file may be used without permission.
                     </div>
 
 
-                    <div id="afu-progress" style="display:none;margin:auto" class="alert alert-info">
+                    <div id="afu-progress" style="margin:auto;display:none;" class="alert alert-info">
                         <img src="spin.gif" style="vertical-align:baseline"> &nbsp; <span id="afu-time">0:00</span><br>
                         Please wait while the firmware is uploaded &amp; flashed.<br>
                         <b>Warning:</b> Do not interrupt this browser or the router!<br>

@@ -30,7 +30,7 @@ do {
         b = sysinfo.freeswap;
         stats.swap = scaleSize(a) + ' / ' + scaleSize(b) + ' <small>(' + (b / a * 100.0).toFixed(2) + '%)</small>';
     } else
-        stats.swap = '';
+    stats.swap = '';
     stats.time = '<% time(); %>';
     stats.wanup = '<% wanup(); %>' == '1';
     stats.wanprebuf = nvram.wan_ipaddr_buf;
@@ -96,7 +96,7 @@ do {
             if (wlstats[uidx].client) {
                 if (wlstats[uidx].rssi == 0) a = 0;
                 else a = MAX(wlstats[uidx].rssi - wlstats[uidx].noise, 0);
-                stats.qual.push(a + ' <img src="bar' + MIN(MAX(Math.floor(a / 10), 1), 6) + '.gif">');
+                stats.qual.push(a + ' <img src="/img/bar' + MIN(MAX(Math.floor(a / 10), 1), 6) + '.gif">');
             }
             else {
                 stats.qual.push('');

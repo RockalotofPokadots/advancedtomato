@@ -2800,6 +2800,18 @@ function AdvancedTomato() {
     }
 }
 
+function keyboardNavi () {
+
+    var el = $('.navi');
+
+    $("a", el).focus(function() {
+        $(this).parents("li").addClass("focus");
+    }).blur(function() {
+        $(this).parents("li").removeClass("focus");
+    });
+
+}
+
 $(function() { // On jQuery load 
 
         $(window).bind("resize", fixNavi);
@@ -2807,6 +2819,7 @@ $(function() { // On jQuery load
         fixNavi();
         backToTop(); // Create back to top button
         AdvancedTomato();
+        keyboardNavi();
 
         $('button.close').click(function() {
                 var UpdateNTF = $(this).attr('data-update');

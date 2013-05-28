@@ -19,7 +19,6 @@ No part of this file may be used without permission.
         <link href="css/tomato.css" rel="stylesheet">
         <% css(); %>
 
-
         <script type="text/javascript" src="js/jquery.lite.min.js"></script>
         <script type="text/javascript" src="tomato.js"></script>
         <script type="text/javascript">

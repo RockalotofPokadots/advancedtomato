@@ -5,42 +5,42 @@
 
 	For use with Tomato Firmware only.
 	No part of this file may be used without permission.
-*/
+	*/
 
-var tabs = [];
-var rx_max, rx_avg;
-var tx_max, tx_avg;
-var xx_max = 0;
-var ifname;
-var htmReady = 0;
-var svgReady = 0;
-var updating = 0;
-var scaleMode = 0;
-var scaleLast = -1;
-var drawMode = 0;
-var drawLast = -1;
-var drawColor = 0;
-var avgMode = 0;
-var avgLast = -1;
-var colorX = 0;
-var colors = [
+	var tabs = [];
+	var rx_max, rx_avg;
+	var tx_max, tx_avg;
+	var xx_max = 0;
+	var ifname;
+	var htmReady = 0;
+	var svgReady = 0;
+	var updating = 0;
+	var scaleMode = 0;
+	var scaleLast = -1;
+	var drawMode = 0;
+	var drawLast = -1;
+	var drawColor = 0;
+	var avgMode = 0;
+	var avgLast = -1;
+	var colorX = 0;
+	var colors = [
 	['Green &amp; Blue', '#118811', '#6495ed'], ['Blue &amp; Orange', '#003EBA', '#FF9000'],
 	['Blue &amp; Red', '#003EDD', '#CC4040'], ['Blue', '#22f', '#225'], ['Gray', '#000', '#999'],
 	['Red &amp; Black', '#d00', '#000'], ['Clean Style', '#454545', '#0089F9'], 
-    ['Tomato Style', '#FD0000', '#494949'], ['Ultra Green', '#6D9E38', '#A6FFA4']];
+	['Tomato Style', '#FD0000', '#494949'], ['Ultra Green', '#6D9E38', '#A6FFA4']];
 
-function xpsb(byt)
-{
+	function xpsb(byt)
+	{
 /* REMOVE-BEGIN
 	kbit/s = 1000 bits/s
 	125 = 1000 / 8
 	((B * 8) / 1000)
-REMOVE-END */
+	REMOVE-END */
 
     if (byt > (1024*1024)) { // Change to mbps
-        return (byt / (125 * 1000)).toFixed(2) + ' <small>mbit/s</small><br>(' + (byt / (1024*1024)).toFixed(2) + ' <small>MB/s</small>)';
+    	return (byt / (125 * 1000)).toFixed(2) + ' <small>mbit/s</small><br>(' + (byt / (1024*1024)).toFixed(2) + ' <small>MB/s</small>)';
     } else {
-        return (byt / 125).toFixed(2) + ' <small>kbit/s</small><br>(' + (byt / 1024).toFixed(2) + ' <small>KB/s</small>)';
+    	return (byt / 125).toFixed(2) + ' <small>kbit/s</small><br>(' + (byt / 1024).toFixed(2) + ' <small>KB/s</small>)';
     }
 }
 
@@ -87,7 +87,7 @@ function switchColor(rev)
 {
 	if ((!svgReady) || (updating)) return;
 	if (rev) colorX ^= 1;
-		else drawColor = (drawColor + 1) % colors.length;
+	else drawColor = (drawColor + 1) % colors.length;
 	showColor();
 	showCTab();
 	cookie.set(cprefix + 'color', drawColor + ',' + colorX);
@@ -158,7 +158,7 @@ function showTab(name)
 	if (svgReady) {
 		max = scaleMode ? MAX(h.rx_max, h.tx_max) : xx_max
 		if (max > 12500) max = Math.round((max + 12499) / 12500) * 12500;
-			else max += 100;
+		else max += 100;
 		updateSVG(h.rx, h.tx, max, drawMode,
 			colors[drawColor][1 + colorX], colors[drawColor][1 + (colorX ^ 1)],
 			updateInt, updateMaxL, updateDiv, avgMode, clock);
@@ -235,51 +235,51 @@ function loadData()
 			else if (wl_ifidx(i) >= 0) {
 /* REMOVE-BEGIN
 //			else if (i == nvram.wl_ifname) {
-REMOVE-END */
-				t = 'WL <small>(' + i + ')</small>';
-			}
+	REMOVE-END */
+	t = 'WL <small>(' + i + ')</small>';
+}
 
-			if (i == 'imq1')	{
-				t = 'Lim. OUT <small>(' + i + ')</small>';
-			}
+if (i == 'imq1')	{
+	t = 'Lim. OUT <small>(' + i + ')</small>';
+}
 
-			if (i == 'imq2')	{
-				t = 'Lim. IN <small>(' + i + ')</small>';
-			}
+if (i == 'imq2')	{
+	t = 'Lim. IN <small>(' + i + ')</small>';
+}
 
-			else if ((nvram.wan_proto == 'pptp') || (nvram.wan_proto == 'pppoe') || (nvram.wan_proto == 'l2tp') || (nvram.wan_proto == 'ppp3g')) {
-				if (nvram.wan_iface == i) t = 'WAN <small>(' + i + ')</small>';
-				else if (nvram.wan_ifname == i && ((nvram.wan_proto != 'pppoe') && (nvram.wan_proto != 'ppp3g'))) t = 'MAN <small>(' + i + ')</small>';
-			}
-			else if (nvram.wan_proto != 'disabled') {
-				if (nvram.wan_ifname == i) t = 'WAN <small>(' + i + ')</small>';
-			}
-			tabs.push(['speed-tab-' + i, t]);
-		}
+else if ((nvram.wan_proto == 'pptp') || (nvram.wan_proto == 'pppoe') || (nvram.wan_proto == 'l2tp') || (nvram.wan_proto == 'ppp3g')) {
+	if (nvram.wan_iface == i) t = 'WAN <small>(' + i + ')</small>';
+	else if (nvram.wan_ifname == i && ((nvram.wan_proto != 'pppoe') && (nvram.wan_proto != 'ppp3g'))) t = 'MAN <small>(' + i + ')</small>';
+}
+else if (nvram.wan_proto != 'disabled') {
+	if (nvram.wan_ifname == i) t = 'WAN <small>(' + i + ')</small>';
+}
+tabs.push(['speed-tab-' + i, t]);
+}
 
-		tabs = tabs.sort(
-			function(a, b) {
-				if (a[1] < b[1]) return -1;
-				if (a[1] > b[1]) return 1;
-				return 0;
-			});
-	}
+tabs = tabs.sort(
+	function(a, b) {
+		if (a[1] < b[1]) return -1;
+		if (a[1] > b[1]) return 1;
+		return 0;
+	});
+}
 
-	if (tabs.length == old.length) {
-		for (i = tabs.length - 1; i >= 0; --i)
-			if (tabs[i][0] != old[i][0]) break;
-		changed = i > 0;
-	}
-	else changed = 1;
+if (tabs.length == old.length) {
+	for (i = tabs.length - 1; i >= 0; --i)
+		if (tabs[i][0] != old[i][0]) break;
+	changed = i > 0;
+}
+else changed = 1;
 
-	if (changed) {
-		E('tab-area').innerHTML = _tabCreate.apply(this, tabs);
-	}
-	if (((name = cookie.get(cprefix + 'tab')) != null) && ((speed_history[name] != undefined))) {
-		showTab('speed-tab-' + name);
-		return;
-	}
-	if (tabs.length) showTab(tabs[0][0]);
+if (changed) {
+	E('tab-area').innerHTML = _tabCreate.apply(this, tabs);
+}
+if (((name = cookie.get(cprefix + 'tab')) != null) && ((speed_history[name] != undefined))) {
+	showTab('speed-tab-' + name);
+	return;
+}
+if (tabs.length) showTab(tabs[0][0]);
 }
 
 function initData()
@@ -363,6 +363,5 @@ function populateCache() {
 					if (nvram['lan' + j + '_netmask'] != '') {
 						hostnamecache[getNetworkAddress(nvram['lan' + j + '_ipaddr'], nvram['lan' + j + '_netmask'])] = 'LAN' + j;
 					}
-	}
-}
-
+				}
+			}

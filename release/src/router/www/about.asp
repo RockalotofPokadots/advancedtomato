@@ -20,7 +20,6 @@ No part of this file may be used without permission.
         <link href="css/tomato.css" rel="stylesheet">
         <% css(); %>
 
-
         <script type="text/javascript" src="js/jquery.lite.min.js"></script>
 
 
@@ -64,10 +63,11 @@ No part of this file may be used without permission.
                     <br>
 
                     <b>AdvancedTomato:</b><br />
-                    - Navigation Style Selection
-                    - Based on Bootstrap<br />
-                    - Designed / Coded by Alex and Jacky<br />
-                    <a href="http://at.prahec.com">AdvancedTomato Page</a> 
+                    - Navigation Style Selection (Jacky)<br />
+                    - Clean up Bootstrap, new styles etc... (Jacky) <br />
+                    - Ported to Shibby's releases (by Jacky) <br />
+                    - Based on Bootstrap (Alex)<br />
+                    <a href="http://at.prahec.com">http://at.prahec.com</a> 
                     <br /><br />
                     
                     <!-- OPENVPN-BEGIN -->

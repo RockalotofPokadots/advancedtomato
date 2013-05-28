@@ -73,11 +73,11 @@
             }
         </script>
     </head>
-    <body onload="init()" style="background: url('img/bg.jpg')" onclick="go()">
+    <body onload="init()" style="background: url('img/bg.png')" onclick="go()">
         <div id="loader">
             <script type='text/javascript'>
-                if (wait <= 0) s = '<b>Changes Saved...</b> &nbsp; <button onclick="go()" class="btn">Continue...</button>';
-                else s = '<b>Please wait... (<span id="xclock" style="visibility:hidden">&nbsp;</span>)</b> &nbsp; <img align="right" src="spin.gif" id="spin" onload="setSpin(1)">';
+                if (wait <= 0) s = 'Changes Saved... &nbsp;<br /><br /> <button onclick="go()" class="btn">Continue</button>';
+                else s = 'Please wait... <b>(<span id="xclock" style="visibility:hidden">&nbsp;</span>)</b> &nbsp; <img align="right" src="spin.gif" id="spin" onload="setSpin(1)">';
                 document.write(s);
             </script>
         </div>

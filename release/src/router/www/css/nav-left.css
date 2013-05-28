@@ -8,12 +8,12 @@ body{padding:10px 0 0 0;}
 #navigation .navi > ul > li > a{height:35px;padding:0 0 0 25px;width:175px;}
 #navigation .navi > ul > li > a:before{content:"";display:inline-block;width:14px;height:14px;line-height:14px;vertical-align:text-top;background-image:url("/img/glyphicons-halflings-white.png");background-position:14px 14px;background-repeat:no-repeat;margin:3px 7px 0 0;background-position:-456px -72px;}
 #navigation .navi ul li.active > a{text-decoration:underline;color:#fff;}
-#navigation .navi li:hover > a,#navigation .navi li:focus > a,#navigation .navi li.clicked > a{color:#fff;background:#4B4B4B;padding-left:27px;width:173px;}
+#navigation .navi li:hover > a,#navigation .navi li.focus > a,#navigation .navi li.clicked > a{color:#fff;background:#4B4B4B;padding-left:27px;width:173px;}
 #navigation .navi li ul{position:fixed;left:175px;height:100%;min-height:110%;top:0;width:150px;box-shadow:0;-webkit-box-shadow:0;-moz-box-shadow:0;padding-top:70px;background:#4B4B4B;}
 #navigation .navi li ul li a{display:block;color:#EBEBEB;line-height:35px;height:35px;padding:0 15px 0 15px;width:122px;text-decoration:none;font-size:12px;background:transparent;border:0;}
 .nav-header{float:none;width:122px;color:#F90000;border:0;height:35px;padding:0 15px 0 10px;margin:0;background:transparent;line-height:35px;}
 #navigation .navi li ul li:last-child a{border-radius:0;border:0;}
-#navigation .navi li ul > li > a:hover{color:#fff;background:rgba(255,255,255,0.1);padding-left:17px;width:120px;}
+#navigation .navi li ul > li > a:hover,#navigation .navi li ul > li > a:focus{color:#fff;background:rgba(255,255,255,0.1);padding-left:17px;width:120px;}
 #navigation .navi ul li ul{transition:none;-webkit-transition:none;-o-transition:none;-moz-transition:none;}
 .footer{padding-left:220px;margin-top:15px;border-top:1px solid #E2E2E2;padding-top:5px;}
 .span12 .footer{padding:0;border:none;}

@@ -92,20 +92,20 @@ function refreshChannels(uidx) {
 	if (e != null)
 	{
 		sb = (e.value + '' == '' ? eval('nvram["wl'+u+'_nctrlsb"]') : e.value);
-/* REMOVE-BEGIN */
+		/* REMOVE-BEGIN */
 // AB
 //		sb = ((e.value + '' == '') ? (nvram['wl'+u+'_nctrlsb']) : e.value);
 /* REMOVE-END */
-		e = E('_wl'+u+'_nbw_cap');
-		bw = (e.value + '' == '' ? eval('nvram["wl'+u+'_nbw_cap"]') : e.value) == '0' ? '20' : '40';
+e = E('_wl'+u+'_nbw_cap');
+bw = (e.value + '' == '' ? eval('nvram["wl'+u+'_nbw_cap"]') : e.value) == '0' ? '20' : '40';
 /* REMOVE-BEGIN */
 // AB
 //		bw = ((e.value + '' == '') ? (nvram['wl'+u+'_nbw_cap']) : e.value) == '0' ? '20' : '40';
 /* REMOVE-END */
-		refresher[uidx].onError = function(ex) { alert(ex); refresher[uidx] = null; reloadPage(); }
-		refresher[uidx].post('update.cgi', 'exec=wlchannels&arg0=' + u + '&arg1=' + (nphy ? '1' : '0') +
-			'&arg2=' + bw + '&arg3=' + selectedBand(uidx) + '&arg4=' + sb);
-	}
+refresher[uidx].onError = function(ex) { alert(ex); refresher[uidx] = null; reloadPage(); }
+refresher[uidx].post('update.cgi', 'exec=wlchannels&arg0=' + u + '&arg1=' + (nphy ? '1' : '0') +
+	'&arg2=' + bw + '&arg3=' + selectedBand(uidx) + '&arg4=' + sb);
+}
 }
 
 function scan() {

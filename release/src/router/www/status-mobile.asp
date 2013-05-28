@@ -15,6 +15,7 @@ No part of this file may be used without permission.
         <meta name="robots" content="noindex,nofollow">
         <title>[<% ident(); %>]: Mobile Access</title>
         <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+        <% css(); %>
         <link rel="stylesheet" type="text/css" href="css/mobile.css">
         <script type="text/javascript" src="js/jquery.lite.min.js"></script>
         <script type="text/javascript" src="tomato.js"></script>
@@ -231,9 +232,9 @@ No part of this file may be used without permission.
 
     <div id="container">
     <div id="head">
-        <div class="right"><% ident(); %></div>
+        <div class="right"><a><% ident(); %></a></div>
         <div class="title">AdvancedTomato</div>
-        <div class="version"><% version(0); %></div>
+        <div class="version"><a><% version(0); %></a></div>
     </div>
 
     <div class="content">
@@ -320,16 +321,16 @@ No part of this file may be used without permission.
             <div class="nofluid center">
                 <h2>Router Control <span class="toggle"><a href="javascript: Toggle('rcontrol')"><i id="s_rcontrol" class="icon-chevron-down icon-black"></i></a></span></h2>
                 <div id="rcontrol">
-                <b>Connect</b>: Will attempt to connect to WAN. | <b>Disconnect</b>: Will attempt to disconnect your WAN. | <b>Reboot</b> will reboot your router<br />
-                    <a href="javascript:wan_connect()" class="but"><i class="icon-home icon-white"></i> Connect</a>
-                    <a href="javascript:wan_disconnect()" class="but"><i class="icon-remove icon-white"></i> Disconnect</a>
-                    <a href="javascript:reboots()" class="but"><i class="icon-off icon-white"></i> Restart</a>
+                    <b>Connect</b>: Will attempt to connect to WAN. | <b>Disconnect</b>: Will attempt to disconnect your WAN. | <b>Reboot</b> will reboot your router<br /><br />
+                    <a href="javascript:wan_connect()" class="but btn btn-primary"><i class="icon-home icon-white"></i> Connect</a>
+                    <a href="javascript:wan_disconnect()" class="but btn btn-primary"><i class="icon-remove icon-white"></i> Disconnect</a>
+                    <a href="javascript:reboots()" class="but btn btn-primary"><i class="icon-off icon-white"></i> Restart</a>
                 </div>
             </div>
             <br /><div style="width: 100%; text-align: center"><a href="/">Switch to Destkop UI</a></div>
         </div>
 
-        <div class="footer">
+        <div class="mfooter">
             CopyRight &copy; 2013 <a href="http://tomatousb.org">Tomato USB Project</a> <br />
             This page is part of AdvancedTomato - <a href="http://at.prahec.com/">AT Home Page</a>
         </div>
